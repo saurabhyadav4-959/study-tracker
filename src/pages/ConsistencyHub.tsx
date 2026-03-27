@@ -66,7 +66,7 @@ const ConsistencyHub = () => {
         
         <h3 className="text-xl font-bold mb-8 flex items-center gap-2">
           <Calendar className="text-primary" size={20} />
-          Weekly Synchronization Matrix
+          Synchronization Matrix
         </h3>
         
         <div className="flex gap-4">
