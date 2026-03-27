@@ -79,7 +79,7 @@ const Login = () => {
     
     // Simulate boot sequence
     setTimeout(() => {
-      window.location.href = '/'; 
+      navigate('/'); 
     }, 800);
   };
 

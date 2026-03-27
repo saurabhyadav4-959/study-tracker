@@ -217,7 +217,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const logout = () => {
     localStorage.removeItem('systemhub_active_user');
-    window.location.href = '/login';
+    window.location.hash = '/login';
   };
   
   const setSidebarOpen = (isOpen: boolean) => {
