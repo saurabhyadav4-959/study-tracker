@@ -65,11 +65,5 @@ export const ScanningLine = () => (
     <div className="w-full h-[1px] bg-indigo-400 shadow-[0_0_15px_rgba(129,140,248,0.8)] animate-scan" style={{
       animation: 'scan 10s linear infinite'
     }} />
-    <style jsx>{`
-      @keyframes scan {
-        0% { transform: translateY(-100vh); }
-        100% { transform: translateY(100vh); }
-      }
-    `}</style>
   </div>
 );
