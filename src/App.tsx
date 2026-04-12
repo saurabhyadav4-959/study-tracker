@@ -14,6 +14,8 @@ import SignalCore from './pages/InternalAlerts';
 import Account from './pages/Account';
 import Login from './pages/Login';
 import NotificationSystem from './components/NotificationSystem';
+import Landing from './pages/Landing';
+import Docs from './pages/Docs';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -33,7 +35,9 @@ const App: React.FC = () => {
     <HashRouter>
       <NotificationSystem />
       <Routes>
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/docs" element={<Docs />} />
         
         <Route 
           element={
@@ -42,7 +46,7 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<Overview />} />
+          <Route path="/dashboard" element={<Overview />} />
           <Route path="/account" element={<Account />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/academic" element={<TrackCore />} />

@@ -25,7 +25,7 @@ const Login = () => {
     // Auto-redirect if already active
     const activeSession = localStorage.getItem('systemhub_active_user');
     if (activeSession) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [navigate]);
 
@@ -79,12 +79,12 @@ const Login = () => {
     
     // Simulate boot sequence
     setTimeout(() => {
-      navigate('/'); 
+      navigate('/dashboard'); 
     }, 800);
   };
 
   return (
-    <div className="min-h-screen bg-[#060608] text-white flex items-center justify-center p-6 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#060608] text-white flex items-center justify-center p-6 relative overflow-hidden font-['Inter']">
       {/* Premium Background Elements */}
       <div className="absolute inset-0 z-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#6366f1 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-primary/10 via-transparent to-secondary/10 pointer-events-none" />
