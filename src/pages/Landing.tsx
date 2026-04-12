@@ -11,24 +11,11 @@ const Landing = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. If currently logged in, go straight to the internal dashboard
+    // If currently logged in, go straight to the internal dashboard
     const activeSession = localStorage.getItem('systemhub_active_user');
     if (activeSession) {
       navigate('/dashboard');
       return;
-    }
-
-    // 2. If they have an account but aren't logged in, skip the landing and go straight to login
-    const storedUsers = localStorage.getItem('systemhub_users');
-    if (storedUsers) {
-      try {
-        const users = JSON.parse(storedUsers);
-        if (users && users.length > 0) {
-          navigate('/login');
-        }
-      } catch (e) {
-        // ignore JSON errors
-      }
     }
   }, [navigate]);
 
