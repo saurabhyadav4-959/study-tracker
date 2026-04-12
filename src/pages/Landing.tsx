@@ -11,12 +11,13 @@ const Landing = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // If currently logged in, go straight to the internal dashboard
+    // 1. If currently logged in, go straight to the internal dashboard
     const activeSession = localStorage.getItem('systemhub_active_user');
     if (activeSession) {
       navigate('/dashboard');
       return;
     }
+
   }, [navigate]);
 
   const handleDocs = (section: string) => {
