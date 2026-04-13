@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { AppState, UserProfile, AuthUser, PersonalMaterial, Recommendation, ActivityLog, TaskStatus } from '../types';
+import { AppState, UserProfile, AuthUser, PersonalMaterial, Recommendation, ActivityLog, TaskStatus, Skill } from '../types';
 
 const generateEmptyLogs = (): ActivityLog[] => {
   const logs: ActivityLog[] = [];
@@ -56,6 +56,7 @@ interface AppContextType {
     updateProfile: (profile: Partial<UserProfile>) => void;
     addTask: (task: any) => void;
     removeTask: (id: string) => void;
+    addSkill: (skill: Omit<Skill, 'id' | 'progress' | 'streak' | 'lastUpdated'>) => void;
     toggleTaskStatus: (id: string) => void;
     toggleDarkMode: () => void;
     addPersonalMaterial: (material: Omit<PersonalMaterial, 'id' | 'dateAdded'>) => void;
@@ -177,14 +178,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const addSkill = (skill: Omit<Skill, 'id' | 'progress' | 'streak' | 'lastUpdated'>) => {
     setState(prev => {
-      const newState = { ...prev, skills: [...prev.skills, { 
+      const newSkill: Skill = { 
         ...skill, 
         id: Math.random().toString(36).substr(2, 9),
         progress: 0,
         streak: 0,
         lastUpdated: new Date().toISOString()
-      }]};
-      return newState;
+      };
+      return { ...prev, skills: [...prev.skills, newSkill] };
     });
     logActivity('NEW_SKILL_SYNC', `Initialized new skill node: ${skill.name}`);
   };

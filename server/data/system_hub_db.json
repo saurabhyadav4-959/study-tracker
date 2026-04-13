@@ -3671,6 +3671,150 @@
       "timeSpent": 0,
       "_id": "log_r9ab7qpym",
       "timestamp": "2026-04-13T12:24:42.645Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_bakv1qzl1",
+      "timestamp": "2026-04-13T12:30:59.420Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_w9813104i",
+      "timestamp": "2026-04-13T12:30:59.439Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_fuzhzbmvu",
+      "timestamp": "2026-04-13T12:30:59.450Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_s0jg9ygs2",
+      "timestamp": "2026-04-13T12:30:59.457Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_cm2zj5nph",
+      "timestamp": "2026-04-13T12:30:59.820Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_fecrpetlx",
+      "timestamp": "2026-04-13T12:30:59.828Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_lraeai8oh",
+      "timestamp": "2026-04-13T12:30:59.836Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_cewes80gs",
+      "timestamp": "2026-04-13T12:30:59.841Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_db1rrfj2x",
+      "timestamp": "2026-04-13T12:31:46.020Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_x3rctc236",
+      "timestamp": "2026-04-13T12:31:46.029Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_zn0qomyvg",
+      "timestamp": "2026-04-13T12:31:46.037Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_a9ukhr8ue",
+      "timestamp": "2026-04-13T12:31:46.046Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_ta7dftmb9",
+      "timestamp": "2026-04-13T12:31:46.407Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_a2ukczfgz",
+      "timestamp": "2026-04-13T12:31:46.416Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_n3yur2j36",
+      "timestamp": "2026-04-13T12:31:46.424Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_1v09pmm9b",
+      "timestamp": "2026-04-13T12:31:46.433Z"
     }
   ],
   "tasks": [
