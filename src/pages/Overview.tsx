@@ -124,8 +124,15 @@ const Overview = () => {
             System Live • Node {state.currentUser?.id.substring(0, 8) || 'Alpha-01'}
           </div>
           <h1 className="text-5xl font-black tracking-tighter uppercase leading-tight">System Overview</h1>
-          <div className="flex gap-4 items-center">
+          <div className="flex flex-wrap gap-4 items-center">
             <p className="text-foreground/40 font-semibold tracking-wide">Synthesizing real-time diagnostics of your academic OS.</p>
+            {state.currentUser?.studentCode && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-xl">
+                 <Shield size={10} className="text-primary" />
+                 <span className="text-[10px] font-black uppercase tracking-widest text-primary">Student Code:</span>
+                 <span className="text-[10px] font-black tracking-widest text-foreground select-all">{state.currentUser.studentCode}</span>
+              </div>
+            )}
             <button 
               onClick={() => {
                 if (confirm("CRITICAL: This will wipe all neural logs and task history. Proceed?")) {
@@ -140,7 +147,7 @@ const Overview = () => {
         </div>
         
         <div className="flex items-center gap-6">
-          <div className="px-6 py-3 bg-white/5 border border-glass-border rounded-2xl flex items-center gap-4">
+          <div className="px-6 py-3 bg-foreground/5 border border-glass-border rounded-2xl flex items-center gap-4">
             <div className="text-right">
               <p className="text-sm font-black uppercase tracking-widest text-foreground/40 mb-1 leading-none">Intelligence Index</p>
               <p className="text-xl font-black text-primary leading-none">{100 + (skillsCount * 2) + Math.floor(focusMinutes / 60)} <span className="text-xs text-foreground/40 italic">iQ</span></p>
@@ -189,7 +196,7 @@ const Overview = () => {
                     <button 
                       key={t} 
                       onClick={() => setTimeframe(t)}
-                      className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${timeframe === t ? 'bg-primary text-foreground shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'bg-white/5 text-foreground/40 hover:bg-white/10'}`}
+                      className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${timeframe === t ? 'bg-primary text-white shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'bg-foreground/5 text-foreground/40 hover:bg-foreground/10'}`}
                     >
                       {t}
                     </button>

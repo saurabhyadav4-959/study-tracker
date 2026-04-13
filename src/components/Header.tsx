@@ -39,6 +39,11 @@ const Header = () => {
           <h2 className="text-lg md:text-xl font-black tracking-tight flex items-center gap-3">
             <span className="text-foreground/50 font-bold italic hidden sm:inline">User:</span> 
             <span className="uppercase tracking-tighter italic">{state.profile.name}</span>
+            {state.currentUser?.studentCode && (
+              <span className="text-[10px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-lg ml-2 hidden sm:inline">
+                ID: {state.currentUser.studentCode}
+              </span>
+            )}
           </h2>
         </div>
       </div>
@@ -63,8 +68,10 @@ const Header = () => {
             <div className="text-right hidden sm:block">
               <p className="text-sm font-black tracking-tight text-foreground uppercase group-hover:text-primary transition-colors">{state.profile.name}</p>
               <div className="flex items-center gap-2 justify-end mt-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                <p className="text-sm text-primary/60 font-black uppercase tracking-widest italic">{state.profile.status}</p>
+                <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${state.currentUser?.role === 'parent' ? 'bg-secondary' : 'bg-primary'}`} />
+                <p className={`text-sm font-black uppercase tracking-widest italic ${state.currentUser?.role === 'parent' ? 'text-secondary/60' : 'text-primary/60'}`}>
+                  {state.currentUser?.role || 'Online'}
+                </p>
               </div>
             </div>
             <div className="relative shrink-0">

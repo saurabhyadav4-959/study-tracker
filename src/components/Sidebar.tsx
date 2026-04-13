@@ -2,15 +2,23 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, User, BookOpen, Rocket, LineChart, 
-  Clock, Zap, Activity, Globe, Bell, Power, Moon, Sun, X
+  Clock, Zap, Activity, Globe, Bell, Power, Moon, Sun, X,
+  Shield, BarChart3, Presentation
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 const Sidebar = () => {
   const { state, dispatch } = useAppContext();
+  const userData = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+  const isParent = userData.role === 'parent';
 
-  const navItems = [
-    { name: 'Overview', path: '/', icon: LayoutDashboard },
+  const navItems = isParent ? [
+    { name: 'Command Center', path: '/parent/dashboard', icon: Shield },
+    { name: 'Identity Manager', path: '/profile', icon: User },
+    { name: 'Student Dashboard', path: '/parent/mirror', icon: Presentation },
+    { name: 'Global Logs', path: '/parent/feed', icon: Activity },
+  ] : [
+    { name: 'Overview', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Identity Manager', path: '/profile', icon: User },
     { name: 'Track Core', path: '/academic', icon: BookOpen },
     { name: 'Skill Evolution', path: '/skills', icon: Rocket },
@@ -34,8 +42,15 @@ const Sidebar = () => {
             <Zap className="text-white fill-white" size={24} />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight">SYSTEM<span className="text-primary italic">HUB</span></h1>
-            <p className="text-xs uppercase tracking-[0.2em] text-foreground/40 font-semibold">Student OS • v0.1</p>
+            <h1 className="text-xl font-bold tracking-tight uppercase">{state.profile.name || 'Anonymous Node'}</h1>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-foreground/40 font-black">
+              {isParent ? 'Supervisor OS' : 'Operator OS'} • v0.2
+            </p>
+            {userData.studentCode && !isParent && (
+              <div className="mt-2 px-2 py-0.5 bg-primary/10 border border-primary/20 rounded-lg inline-block">
+                <p className="text-[8px] font-black tracking-widest text-primary uppercase">ID: {userData.studentCode}</p>
+              </div>
+            )}
           </div>
         </div>
         <button 
@@ -66,7 +81,7 @@ const Sidebar = () => {
         >
           <div className="flex items-center gap-3">
             {state.isDarkMode ? <Moon size={16} className="text-secondary" /> : <Sun size={16} className="text-yellow-500" />}
-            <span className="text-xs font-black uppercase tracking-widest text-foreground/60">{state.isDarkMode ? 'Dark Node' : 'Light Node'}</span>
+            <span className="text-xs font-black uppercase tracking-widest text-foreground/60">{state.isDarkMode ? 'Dark Mode' : 'Light Mode'}</span>
           </div>
           <div className={`w-8 h-4 rounded-full relative transition-colors ${state.isDarkMode ? 'bg-secondary' : 'bg-slate-300'}`}>
             <div className={`absolute top-1 w-2 h-2 rounded-full bg-white transition-all ${state.isDarkMode ? 'left-5' : 'left-1'}`} />

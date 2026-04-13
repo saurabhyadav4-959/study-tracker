@@ -13,14 +13,18 @@ export interface UserProfile {
   xp: number;
   level: number;
   email: string;
-  status: 'Online' | 'Deep Work' | 'In Class' | 'Break';
+  status: string;
   academicStream: 'Engineering' | 'Medical' | 'Commerce' | 'Humanities';
 }
 
 export interface AuthUser {
   id: string;
-  username: string;
+  username?: string;
+  name?: string;
   email: string;
+  role: 'student' | 'parent' | 'pending';
+  token?: string;
+  studentCode?: string;
 }
 
 export interface AcademicTask {
@@ -78,6 +82,35 @@ export interface ActivityLog {
   date: string;
   intensity: number;
   count?: number;
+}
+
+export interface ActionLog {
+  id?: string;
+  userId: string;
+  studentId?: string;
+  role: string;
+  actionType: string;
+  description: string;
+  timeSpent?: number;
+  timestamp: string;
+}
+
+export interface ChildSummary {
+  id: string;
+  name: string;
+  email: string;
+  totalStudyTime: number;
+  completedTasks: number;
+  totalTasks: number;
+  recentLogs: ActionLog[];
+  milestones?: any[];
+}
+
+export interface PerformanceInsights {
+  mostActive: string;
+  leastActive: string;
+  avgStudyTime: number;
+  overallCompletionRate: number;
 }
 
 export interface AppState {

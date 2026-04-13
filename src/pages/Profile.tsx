@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { User, Shield, Edit3, Save, Globe, Target, Terminal, ChevronRight, BookOpen, Layers, Music, MapPin, Crosshair, HelpCircle, Activity } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Shield, Edit3, Save, Globe, Target, Terminal, ChevronRight, BookOpen, Layers, Music, MapPin, Crosshair, HelpCircle, Activity, Users } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import QuantumSelect from '../components/ui/QuantumSelect';
 
@@ -7,6 +7,45 @@ const Profile = () => {
   const { state, dispatch } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(state.profile);
+  const [managedNodes, setManagedNodes] = useState<any[]>([]);
+
+  const fetchManagedNodes = async () => {
+    if (state.currentUser?.role !== 'parent') return;
+    const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+    if (!user.token) return;
+    try {
+      const res = await fetch('/api/parent/children', {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setManagedNodes(data);
+      } else {
+        setManagedNodes([]);
+      }
+    } catch (err) {
+      console.error('Failed to fetch managed nodes', err);
+      setManagedNodes([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchManagedNodes();
+  }, [state.currentUser]);
+
+  const handleSeverLink = async (studentId: string) => {
+    if (!window.confirm('WARNING: Are you sure you want to sever the neural link with this node?')) return;
+    const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+    try {
+      const res = await fetch(`/api/parent/link/${studentId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      if (res.ok) fetchManagedNodes();
+    } catch (err) {
+      console.error('Failed to sever link', err);
+    }
+  };
 
   const handleSave = () => {
     dispatch.updateProfile(formData);
@@ -66,29 +105,46 @@ const Profile = () => {
             </div>
 
             <h2 className="text-3xl font-black tracking-tight mb-2 mb-4 text-center">{formData.name}</h2>
-            <div className="px-6 py-2 bg-white/5 border border-white/5 rounded-full text-xs font-black uppercase tracking-[0.3em] text-white/30 mb-8 w-full text-center">
-              {formData.email || 'SAURABHY4959@GMAIL.COM'}
+            <div className="space-y-2 w-full mb-8">
+              <div className="px-6 py-2 bg-white/5 border border-white/5 rounded-full text-xs font-black uppercase tracking-[0.3em] text-white/30 w-full text-center">
+                {formData.email || 'SAURABHY4959@GMAIL.COM'}
+              </div>
+              {state.currentUser?.studentCode && (
+                <div className="px-6 py-2 bg-primary/10 border border-primary/20 rounded-full text-xs font-black uppercase tracking-[0.3em] text-primary w-full text-center group-hover:bg-primary/20 transition-all cursor-pointer" title="Click to copy Student ID">
+                  ID: {state.currentUser.studentCode}
+                </div>
+              )}
             </div>
             
             <div className="flex flex-col gap-3 w-full">
               <div className="px-6 py-3 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-black uppercase tracking-[0.2em] rounded-xl flex items-center justify-center gap-2">
-                User Rank: <span className="text-foreground">SCOUT</span>
+                User Access: <span className="text-foreground uppercase">{state.currentUser?.role || 'SCOUT'}</span>
               </div>
-              <div className="px-6 py-3 bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-[0.2em] rounded-xl flex items-center justify-center gap-2">
-                {formData.academicStream} TRACK
-              </div>
+              {state.currentUser?.role === 'student' && (
+                <div className="px-6 py-3 bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-[0.2em] rounded-xl flex items-center justify-center gap-2">
+                  {formData.academicStream} TRACK
+                </div>
+              )}
             </div>
             
-            <div className="mt-12 pt-12 border-t border-glass-border w-full grid grid-cols-2 gap-8 text-center">
-              <div className="space-y-1">
-                <p className="text-4xl font-black text-foreground">{formData.xp}</p>
-                <p className="text-xs font-black uppercase tracking-widest text-foreground/40">Total XP</p>
+            {state.currentUser?.role === 'student' && (
+              <div className="mt-12 pt-12 border-t border-glass-border w-full grid grid-cols-2 gap-8 text-center">
+                <div className="space-y-1">
+                  <p className="text-4xl font-black text-foreground">{formData.xp}</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-foreground/40">Total XP</p>
+                </div>
+                <div className="space-y-1 border-l border-glass-border">
+                  <p className="text-4xl font-black text-foreground">0</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-foreground/40">Mindfulness</p>
+                </div>
               </div>
-              <div className="space-y-1 border-l border-glass-border">
-                <p className="text-4xl font-black text-foreground">0</p>
-                <p className="text-xs font-black uppercase tracking-widest text-foreground/40">Mindfulness</p>
+            )}
+            {state.currentUser?.role === 'parent' && (
+              <div className="mt-12 pt-12 border-t border-glass-border w-full text-center">
+                <p className="text-4xl font-black text-primary uppercase italic tracking-tighter">Supervised</p>
+                <p className="text-xs font-black uppercase tracking-widest text-foreground/40">Operational Status</p>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="glass-card p-10 bg-gradient-to-br from-primary/5 to-transparent border-primary/10 relative overflow-hidden group">
@@ -112,33 +168,37 @@ const Profile = () => {
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              {/* Field 1: Primary Track */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-black text-foreground/40 ml-1">
-                  <BookOpen size={14} className="text-primary" />
-                  Primary Track
-                </div>
-                <QuantumSelect 
-                  disabled={!isEditing}
-                  value={formData.academicStream}
-                  onChange={(val) => setFormData({...formData, academicStream: val as any})}
-                  options={streams}
-                />
-              </div>
+              {state.currentUser?.role === 'student' && (
+                <>
+                  {/* Field 1: Primary Track */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-black text-foreground/40 ml-1">
+                      <BookOpen size={14} className="text-primary" />
+                      Primary Track
+                    </div>
+                    <QuantumSelect 
+                      disabled={!isEditing}
+                      value={formData.academicStream}
+                      onChange={(val) => setFormData({...formData, academicStream: val as any})}
+                      options={streams}
+                    />
+                  </div>
 
-              {/* Field 2: Study Preference */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-black text-foreground/40 ml-1">
-                  <Music size={14} className="text-primary" />
-                  Study Preference
-                </div>
-                <QuantumSelect 
-                  disabled={!isEditing}
-                  value={formData.studyPreference}
-                  onChange={(val) => setFormData({...formData, studyPreference: val})}
-                  options={preferences}
-                />
-              </div>
+                  {/* Field 2: Study Preference */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-black text-foreground/40 ml-1">
+                      <Music size={14} className="text-primary" />
+                      Study Preference
+                    </div>
+                    <QuantumSelect 
+                      disabled={!isEditing}
+                      value={formData.studyPreference}
+                      onChange={(val) => setFormData({...formData, studyPreference: val})}
+                      options={preferences}
+                    />
+                  </div>
+                </>
+              )}
 
               {/* Field 3: Institution */}
               <div className="space-y-4">
@@ -155,34 +215,38 @@ const Profile = () => {
                 />
               </div>
 
-              {/* Field 4: Daily XP Target */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-black text-foreground/40 ml-1">
-                  <Crosshair size={14} className="text-primary" />
-                  Daily XP Target
-                </div>
-                <input 
-                  type="number"
-                  disabled={!isEditing}
-                  value={formData.dailyXPTarget}
-                  onChange={(e) => setFormData({...formData, dailyXPTarget: parseInt(e.target.value)})}
-                  className="quantum-input"
-                />
-              </div>
+              {state.currentUser?.role === 'student' && (
+                <>
+                  {/* Field 4: Daily XP Target */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-black text-foreground/40 ml-1">
+                      <Crosshair size={14} className="text-primary" />
+                      Daily XP Target
+                    </div>
+                    <input 
+                      type="number"
+                      disabled={!isEditing}
+                      value={formData.dailyXPTarget}
+                      onChange={(e) => setFormData({...formData, dailyXPTarget: parseInt(e.target.value)})}
+                      className="quantum-input"
+                    />
+                  </div>
 
-              {/* Field 5: Academic Level */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-black text-foreground/40 ml-1">
-                  <Layers size={14} className="text-primary" />
-                  Academic Level
-                </div>
-                <QuantumSelect 
-                  disabled={!isEditing}
-                  value={formData.academicLevel}
-                  onChange={(val) => setFormData({...formData, academicLevel: val})}
-                  options={levels}
-                />
-              </div>
+                  {/* Field 5: Academic Level */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-black text-foreground/40 ml-1">
+                      <Layers size={14} className="text-primary" />
+                      Academic Level
+                    </div>
+                    <QuantumSelect 
+                      disabled={!isEditing}
+                      value={formData.academicLevel}
+                      onChange={(val) => setFormData({...formData, academicLevel: val})}
+                      options={levels}
+                    />
+                  </div>
+                </>
+              )}
 
               {/* Field 6: Personal Hub */}
               <div className="space-y-4">
@@ -231,6 +295,49 @@ const Profile = () => {
               <ChevronRight size={32} />
             </div>
           </div>
+
+          {/* Managed Nodes Registry (for Parents only) */}
+          {state.currentUser?.role === 'parent' && (
+            <div className="glass-card p-12 border-2 border-glass-border">
+              <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-12 flex items-center gap-3">
+                <Users size={16} />
+                Managed Nodes
+              </h3>
+              
+              <div className="space-y-4">
+                {managedNodes.map(node => (
+                  <div key={node.id} className="flex flex-col sm:flex-row justify-between items-center bg-white/5 border border-glass-border rounded-2xl p-6 hover:bg-white/[0.08] transition-colors gap-6">
+                     <div className="flex items-center gap-4 w-full sm:w-auto">
+                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-xl uppercase shadow-inner border border-primary/20">
+                          {(node.name || 'U').charAt(0)}
+                        </div>
+                        <div>
+                           <h4 className="font-black text-lg tracking-wide uppercase">{node.name || 'Unknown Node'}</h4>
+                           <p className="text-xs font-bold text-foreground/40">{node.email || 'NO EMAIL'}</p>
+                        </div>
+                     </div>
+                     <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                        <span className="px-4 py-2 bg-foreground/5 rounded-xl border border-glass-border text-xs font-black text-foreground/60 tracking-widest truncate max-w-[120px]">
+                          {node.id}
+                        </span>
+                        <button 
+                          onClick={() => handleSeverLink(node.id)}
+                          className="px-6 py-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border-2 border-red-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
+                        >
+                          Remove
+                        </button>
+                     </div>
+                  </div>
+                ))}
+                
+                {managedNodes.length === 0 && (
+                  <div className="text-center p-12 bg-white/5 border border-glass-border border-dashed rounded-2xl">
+                     <p className="text-xs font-black uppercase tracking-[0.4em] text-foreground/30">No Active Student Nodes Linked</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

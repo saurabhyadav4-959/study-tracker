@@ -32,7 +32,7 @@ const defaultProfile: UserProfile = {
   xp: 0,
   level: 1,
   email: '',
-  status: 'Online',
+  status: 'Pending Choice',
   academicStream: 'Engineering'
 };
 
@@ -77,9 +77,26 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Use a temporary key until we determine the active user
   const [activeUserKey, setActiveUserKey] = React.useState<string | null>(null);
-  
-  // This state holds the actual app data, mapped to whatever key is active
   const [state, setState] = React.useState<AppState>(zeroState);
+
+  // Sync Helper
+  const logActivity = async (actionType: string, description: string, timeSpent: number = 0) => {
+    const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+    if (!user.token) return;
+
+    try {
+      await fetch('/api/logs', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+        body: JSON.stringify({ actionType, description, timeSpent })
+      });
+    } catch (err) {
+      console.error('FAILED TO LOG NEURAL ACTIVITY', err);
+    }
+  };
 
   React.useEffect(() => {
     const activeSession = localStorage.getItem('systemhub_active_user');
@@ -89,39 +106,52 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         const userKey = `systemhub_data_${user.id}`;
         setActiveUserKey(userKey);
         
-        // Load the specific user's data or initialize with zeroState
         const storedData = localStorage.getItem(userKey);
         if (storedData) {
           const parsed = JSON.parse(storedData);
-          // Migrate old data if activityLogs are missing or empty
           if (!parsed.activityLogs || parsed.activityLogs.length === 0) {
             parsed.activityLogs = generateEmptyLogs();
           }
-          // Ensure other missing fields are handled
           if (!parsed.personalMaterials) parsed.personalMaterials = [];
           if (!parsed.recommendations) parsed.recommendations = [];
-          
           setState(parsed);
         } else {
           const newUserState: AppState = { 
             ...zeroState, 
             currentUser: user, 
-            profile: { ...defaultProfile, name: user.username, email: user.email },
+            profile: { ...defaultProfile, name: user.name || user.username, email: user.email },
             activityLogs: generateEmptyLogs()
           };
           setState(newUserState);
           localStorage.setItem(userKey, JSON.stringify(newUserState));
         }
+        
+        // Initial Login Log
+        logActivity('LOGIN', `Node ${user.name} initialized connection`);
+        
       } catch (e) {
         console.error("Failed to parse active user session", e);
       }
     }
   }, []);
 
-  // Sync state changes to the active user's local storage key
+  // Sync state changes to local storage AND backend
   React.useEffect(() => {
     if (activeUserKey && state.currentUser) {
       localStorage.setItem(activeUserKey, JSON.stringify(state));
+      
+      // Sync Tasks to Backend
+      const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+      if (user.token && state.tasks.length > 0) {
+        fetch('/api/tasks/sync', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+          },
+          body: JSON.stringify({ tasks: state.tasks })
+        }).catch(e => console.error('SYNC ERROR', e));
+      }
     }
   }, [state, activeUserKey]);
 
@@ -132,6 +162,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const addTask = (task: any) => {
     setState(prev => ({ ...prev, tasks: [...prev.tasks, task] }));
+    logActivity('ADD_TASK', `Initialized new objective: ${task.title}`);
   };
 
   const toggleDarkMode = () => {
@@ -139,7 +170,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const removeTask = (id: string) => {
+    const task = state.tasks.find(t => t.id === id);
     setState(prev => ({ ...prev, tasks: prev.tasks.filter(t => t.id !== id) }));
+    logActivity('DELETE_TASK', `Purged objective: ${task?.title || 'Unknown'}`);
+  };
+
+  const addSkill = (skill: Omit<Skill, 'id' | 'progress' | 'streak' | 'lastUpdated'>) => {
+    setState(prev => {
+      const newState = { ...prev, skills: [...prev.skills, { 
+        ...skill, 
+        id: Math.random().toString(36).substr(2, 9),
+        progress: 0,
+        streak: 0,
+        lastUpdated: new Date().toISOString()
+      }]};
+      return newState;
+    });
+    logActivity('NEW_SKILL_SYNC', `Initialized new skill node: ${skill.name}`);
   };
 
   const toggleTaskStatus = (id: string) => {
@@ -147,6 +194,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       const task = prev.tasks.find(t => t.id === id);
       const isFinishing = task && task.status !== 'Done';
       
+      if (isFinishing) {
+        logActivity('COMPLETE_TASK', `Objective Achieved: ${task.title}`);
+      }
+
       const newState: AppState = {
         ...prev,
         tasks: prev.tasks.map(t => t.id === id ? { ...t, status: (t.status === 'Done' ? 'Todo' : 'Done') as TaskStatus } : t)
@@ -165,13 +216,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             intensity: Math.min(4, Math.floor(currentCount / 2) + 1)
           };
         } else {
-          // If for some reason today's log is missing, create it
-          updatedLogs.push({
-            date: todayStr,
-            count: 1,
-            intensity: 1
-          });
-          // Sort to keep timeline correct
+          updatedLogs.push({ date: todayStr, count: 1, intensity: 1 });
           updatedLogs.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         }
         newState.activityLogs = updatedLogs;
@@ -187,6 +232,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       dateAdded: new Date().toISOString()
     };
     setState(prev => ({ ...prev, personalMaterials: [...prev.personalMaterials, newMaterial] }));
+    logActivity('ADD_MATERIAL', `Synthesized resource: ${material.title}`);
   };
 
   const removePersonalMaterial = (id: string) => {
@@ -195,6 +241,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const addAlert = (alert: any) => {
     setState(prev => ({ ...prev, alerts: [alert, ...prev.alerts] }));
+    logActivity('ADD_ALERT', `Neural signal established: ${alert.taskName}`);
   };
 
   const removeAlert = (id: string) => {
@@ -216,6 +263,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const logout = () => {
+    logActivity('LOGOUT', 'Identity disconnected from core');
     localStorage.removeItem('systemhub_active_user');
     window.location.hash = '/login';
   };
@@ -232,9 +280,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setState(prev => ({
       ...zeroState,
       currentUser: prev.currentUser,
-      profile: { ...defaultProfile, name: prev.currentUser?.username || prev.profile.name, email: prev.currentUser?.email || prev.profile.email },
+      profile: { ...defaultProfile, name: prev.currentUser?.name || prev.profile.name, email: prev.currentUser?.email || prev.profile.email },
       activityLogs: generateEmptyLogs()
     }));
+    logActivity('RESET_DATA', 'Wiped all local neural nodes');
   };
 
   const completeFocusSession = (minutes: number) => {
@@ -261,22 +310,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           intensity: Math.min(4, Math.floor(currentCount / 2) + 1)
         };
       } else {
-        updatedLogs.push({
-          date: todayStr,
-          count: 1,
-          intensity: 1
-        });
+        updatedLogs.push({ date: todayStr, count: 1, intensity: 1 });
         updatedLogs.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
       }
       newState.activityLogs = updatedLogs;
       return newState;
     });
+    logActivity('STUDY_SESSION', `Deep Work Cycle completed`, minutes);
   };
 
   const dispatch = { 
     updateProfile, 
     addTask, 
     removeTask, 
+    addSkill,
     toggleTaskStatus, 
     toggleDarkMode,
     addPersonalMaterial,

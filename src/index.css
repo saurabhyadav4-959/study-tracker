@@ -4,28 +4,29 @@
 
 @layer base {
   :root {
-    --background: #050505;
-    --foreground: #ffffff;
+    --background: #fcfcfd;
+    --foreground: #0a0a0c;
     --sidebar: #ffffff;
-    --glass-bg: rgba(255, 255, 255, 0.02);
-    --glass-border: rgba(255, 255, 255, 0.05);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-    --primary: #6366f1;
-    --secondary: #a855f7;
-    --nav-hover: rgba(99, 102, 241, 0.05);
-    --nav-active: rgba(99, 102, 241, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --primary: #4f46e5;
+    --secondary: #9333ea;
+    --nav-hover: rgba(79, 70, 229, 0.05);
+    --nav-active: rgba(79, 70, 229, 0.1);
   }
 
   .dark {
-    --background: #0a0a0c;
+    --background: #060608;
     --foreground: #ffffff;
-    --sidebar: rgba(15, 15, 20, 0.8);
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.06);
-    --glass-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+    --sidebar: rgba(13, 13, 18, 0.9);
+    --glass-bg: rgba(255, 255, 255, 0.02);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.8);
+    --primary: #6366f1;
+    --secondary: #a855f7;
     --nav-hover: rgba(255, 255, 255, 0.05);
     --nav-active: rgba(255, 255, 255, 0.1);
-    --tactical-glow: 0 0 20px rgba(99, 102, 241, 0.1);
   }
 
   body {
