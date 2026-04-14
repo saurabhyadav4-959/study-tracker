@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 import { 
   Zap, Clock, Target, Shield, ChevronLeft, 
   Activity, Rocket, BookOpen, Layers, Search,
@@ -39,7 +40,7 @@ const ParentInsight = () => {
   const fetchChildren = async () => {
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     try {
-      const res = await fetch('/api/parent/children', {
+      const res = await fetch(`${API_BASE_URL}/api/parent/children`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const childrenData = await res.json();
@@ -59,7 +60,7 @@ const ParentInsight = () => {
     setScanLoading(true);
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     try {
-      const res = await fetch(`/api/parent/child/${childId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/parent/child/${childId}`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const deepData = await res.json();
@@ -230,7 +231,7 @@ const ParentInsight = () => {
                               const val = (e.target as HTMLInputElement).value;
                               if (!val) return;
                               const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
-                              await fetch('/api/logs', {
+                              await fetch(`${API_BASE_URL}/api/logs`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
                                 body: JSON.stringify({ actionType: 'SUPERVISOR_REMARK', description: `[SUPERVISOR INSIGHT]: ${val}`, studentId: data.profile.id })
@@ -258,7 +259,7 @@ const ParentInsight = () => {
                                const title = (document.getElementById('task-title') as HTMLInputElement).value;
                                if (!title) return;
                                const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
-                               await fetch('/api/parent/assign-task', {
+                               await fetch(`${API_BASE_URL}/api/parent/assign-task`, {
                                  method: 'POST',
                                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
                                  body: JSON.stringify({ studentId: data.profile.id, title, priority: 'High' })

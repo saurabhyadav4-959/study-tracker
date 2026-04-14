@@ -131,6 +131,72 @@
       "linkedChildren": [],
       "_id": "node_5keyi4yvj",
       "createdAt": "2026-04-13T11:43:59.913Z"
+    },
+    {
+      "name": "12345",
+      "email": "23456@gmail.com",
+      "password": "$2b$10$cTJvj4lp1BwmncajHpVM0u2pM6uModM.PxkVPoKUtSoIl/oYF4V4u",
+      "role": "pending",
+      "linkedChildren": [],
+      "_id": "node_bpca2qq1c",
+      "createdAt": "2026-04-13T13:19:39.954Z"
+    },
+    {
+      "name": "Test User",
+      "email": "test@example.com",
+      "password": "$2b$10$z0QKrCvi.wN09fpxOVIk4eTYX.21MWw66KXtT./S3poAiCoh/7p0e",
+      "role": "pending",
+      "linkedChildren": [],
+      "_id": "node_z5ckj3q2p",
+      "createdAt": "2026-04-13T14:29:11.322Z"
+    },
+    {
+      "name": "Student Test",
+      "email": "student_test@gmail.com",
+      "password": "$2b$10$m5ajHM/oS8EoIPbJBZPztORQAUdFRbXGZoJxU8257OtVEOJQ0DcFS",
+      "role": "student",
+      "linkedChildren": [],
+      "_id": "node_qz9q9yh1v",
+      "createdAt": "2026-04-13T14:49:44.972Z",
+      "studentCode": "STU-O4OM2"
+    },
+    {
+      "name": "Verify Student",
+      "email": "verify_user@gmail.com",
+      "password": "$2b$10$CyOwgrI1N8ikwRWMcE7iu./VDJEf6P1ZM3oQ69iv2/KrKKI13erf2",
+      "role": "student",
+      "linkedChildren": [],
+      "_id": "node_k3hx84jl9",
+      "createdAt": "2026-04-13T14:51:58.693Z",
+      "studentCode": "STU-F6COP"
+    },
+    {
+      "name": "test",
+      "email": "test@test.com",
+      "password": "$2b$10$WKn0l/5V99Tp.QJ9PoGCHOILKOLBn2ZGVMHmR01IrmbtAi7O03OuK",
+      "role": "student",
+      "linkedChildren": [],
+      "_id": "node_se5ozi4u9",
+      "createdAt": "2026-04-13T14:53:23.050Z",
+      "studentCode": "STU-1WBHK"
+    },
+    {
+      "name": "realtest",
+      "email": "real@test.com",
+      "password": "$2b$10$qufQE4vov0Swj94xZlKUSelpWb1KU.8RIFSpF0AifnyhWQlcPizE2",
+      "role": "pending",
+      "linkedChildren": [],
+      "_id": "node_rx14t321x",
+      "createdAt": "2026-04-13T14:54:26.159Z"
+    },
+    {
+      "name": "saas",
+      "email": "admin@vanguard.os",
+      "password": "$2b$10$3qwjXtNIyJ62aU1EwSwh6.gK2cEB/Mf9YkrEluWYT.NsIEz/.QRdq",
+      "role": "pending",
+      "linkedChildren": [],
+      "_id": "node_397n7r7yl",
+      "createdAt": "2026-04-13T15:19:54.173Z"
     }
   ],
   "logs": [
@@ -3815,6 +3881,645 @@
       "timeSpent": 0,
       "_id": "log_1v09pmm9b",
       "timestamp": "2026-04-13T12:31:46.433Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_3lrwaa2p7",
+      "timestamp": "2026-04-13T13:18:02.813Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_8binu4mfp",
+      "timestamp": "2026-04-13T13:18:02.870Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_2u0s65chc",
+      "timestamp": "2026-04-13T13:18:02.881Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_ew4bimbvl",
+      "timestamp": "2026-04-13T13:18:02.900Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_iiuaqn7z3",
+      "timestamp": "2026-04-13T13:18:02.915Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_4qo415ons",
+      "timestamp": "2026-04-13T13:18:02.931Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_177r3omsz",
+      "timestamp": "2026-04-13T13:18:02.964Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_y7w79kh1q",
+      "timestamp": "2026-04-13T13:18:02.980Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_riz8dvx2a",
+      "timestamp": "2026-04-13T13:18:44.647Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_rhbdaufus",
+      "timestamp": "2026-04-13T13:18:44.658Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_66i02gld5",
+      "timestamp": "2026-04-13T13:18:44.668Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_u12co6emx",
+      "timestamp": "2026-04-13T13:18:44.682Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_i0888due5",
+      "timestamp": "2026-04-13T13:18:44.699Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_g2feja16n",
+      "timestamp": "2026-04-13T13:18:44.722Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_pcz0z1e2p",
+      "timestamp": "2026-04-13T13:18:44.798Z"
+    },
+    {
+      "userId": "node_5keyi4yvj",
+      "role": "parent",
+      "actionType": "LOGIN",
+      "description": "Node parent11 initialized connection",
+      "timeSpent": 0,
+      "_id": "log_2vp9jqkir",
+      "timestamp": "2026-04-13T13:18:44.806Z"
+    },
+    {
+      "userId": "node_r12xpeoab",
+      "role": "student",
+      "actionType": "LOGIN",
+      "description": "Node asdfg initialized connection",
+      "timeSpent": 0,
+      "_id": "log_lw5gl2opm",
+      "timestamp": "2026-04-13T14:15:42.532Z"
+    },
+    {
+      "userId": "node_r12xpeoab",
+      "role": "student",
+      "actionType": "LOGIN",
+      "description": "Node asdfg initialized connection",
+      "timeSpent": 0,
+      "_id": "log_beo8kpzhn",
+      "timestamp": "2026-04-13T14:15:42.545Z"
+    },
+    {
+      "userId": "node_r12xpeoab",
+      "role": "student",
+      "actionType": "LOGIN",
+      "description": "Node asdfg initialized connection",
+      "timeSpent": 0,
+      "_id": "log_sjy1ku0s9",
+      "timestamp": "2026-04-13T14:15:42.550Z"
+    },
+    {
+      "userId": "node_r12xpeoab",
+      "role": "student",
+      "actionType": "LOGIN",
+      "description": "Node asdfg initialized connection",
+      "timeSpent": 0,
+      "_id": "log_9k9rlrlku",
+      "timestamp": "2026-04-13T14:15:42.556Z"
+    },
+    {
+      "userId": "node_r12xpeoab",
+      "role": "student",
+      "actionType": "LOGIN",
+      "description": "Node asdfg initialized connection",
+      "timeSpent": 0,
+      "_id": "log_tcvgjcgyp",
+      "timestamp": "2026-04-13T14:15:42.563Z"
+    },
+    {
+      "userId": "node_r12xpeoab",
+      "role": "student",
+      "actionType": "LOGIN",
+      "description": "Node asdfg initialized connection",
+      "timeSpent": 0,
+      "_id": "log_t3r8em0p2",
+      "timestamp": "2026-04-13T14:15:42.568Z"
+    },
+    {
+      "userId": "node_r12xpeoab",
+      "role": "student",
+      "actionType": "LOGIN",
+      "description": "Node asdfg initialized connection",
+      "timeSpent": 0,
+      "_id": "log_w62kdqq6f",
+      "timestamp": "2026-04-13T14:15:42.575Z"
+    },
+    {
+      "userId": "node_r12xpeoab",
+      "role": "student",
+      "actionType": "LOGIN",
+      "description": "Node asdfg initialized connection",
+      "timeSpent": 0,
+      "_id": "log_cavrve3ei",
+      "timestamp": "2026-04-13T14:15:42.580Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_95tjwbz30",
+      "timestamp": "2026-04-13T14:18:58.456Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_ejt5r88jt",
+      "timestamp": "2026-04-13T14:18:58.472Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_k22ce80jy",
+      "timestamp": "2026-04-13T14:18:58.481Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_zn1co2g4s",
+      "timestamp": "2026-04-13T14:18:58.490Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_m2r8pe37r",
+      "timestamp": "2026-04-13T14:19:05.368Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_z7yf4nl9k",
+      "timestamp": "2026-04-13T14:19:05.391Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_hl3atv616",
+      "timestamp": "2026-04-13T14:19:05.409Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_qdiy73pb2",
+      "timestamp": "2026-04-13T14:19:05.421Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_2gjhlbf9h",
+      "timestamp": "2026-04-13T14:19:08.164Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_6hqpyz1to",
+      "timestamp": "2026-04-13T14:19:08.174Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_amymoebct",
+      "timestamp": "2026-04-13T14:19:08.183Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_5j0xknz9z",
+      "timestamp": "2026-04-13T14:19:08.192Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_jgxijtu40",
+      "timestamp": "2026-04-13T14:19:13.696Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_tg801y3j8",
+      "timestamp": "2026-04-13T14:19:13.708Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_q5nrml048",
+      "timestamp": "2026-04-13T14:19:13.715Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_5v34sy720",
+      "timestamp": "2026-04-13T14:19:13.724Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_9eka1ua3p",
+      "timestamp": "2026-04-13T14:19:20.770Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_io3s0sl45",
+      "timestamp": "2026-04-13T14:19:20.780Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_49i1cgbal",
+      "timestamp": "2026-04-13T14:19:20.797Z"
+    },
+    {
+      "userId": "node_hiajtlhv3",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node saurabh initialized connection",
+      "timeSpent": 0,
+      "_id": "log_atgm96293",
+      "timestamp": "2026-04-13T14:19:20.809Z"
+    },
+    {
+      "userId": "node_z5ckj3q2p",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Test User initialized connection",
+      "timeSpent": 0,
+      "_id": "log_9afwgewrw",
+      "timestamp": "2026-04-13T14:48:41.498Z"
+    },
+    {
+      "userId": "node_z5ckj3q2p",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Test User initialized connection",
+      "timeSpent": 0,
+      "_id": "log_v5aziuub0",
+      "timestamp": "2026-04-13T14:48:41.512Z"
+    },
+    {
+      "userId": "node_z5ckj3q2p",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Test User initialized connection",
+      "timeSpent": 0,
+      "_id": "log_g0wro7jt9",
+      "timestamp": "2026-04-13T14:48:41.520Z"
+    },
+    {
+      "userId": "node_z5ckj3q2p",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Test User initialized connection",
+      "timeSpent": 0,
+      "_id": "log_h2t0na1h9",
+      "timestamp": "2026-04-13T14:48:41.530Z"
+    },
+    {
+      "userId": "node_qz9q9yh1v",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Student Test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_ywef3mx2n",
+      "timestamp": "2026-04-13T14:49:57.273Z"
+    },
+    {
+      "userId": "node_qz9q9yh1v",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Student Test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_15k8tog5n",
+      "timestamp": "2026-04-13T14:49:57.287Z"
+    },
+    {
+      "userId": "node_qz9q9yh1v",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Student Test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_xgy9qhvdd",
+      "timestamp": "2026-04-13T14:49:57.297Z"
+    },
+    {
+      "userId": "node_qz9q9yh1v",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Student Test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_iclpi0ots",
+      "timestamp": "2026-04-13T14:49:57.306Z"
+    },
+    {
+      "userId": "node_qz9q9yh1v",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Student Test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_il5838kga",
+      "timestamp": "2026-04-13T14:50:25.758Z"
+    },
+    {
+      "userId": "node_qz9q9yh1v",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Student Test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_7w45cizs4",
+      "timestamp": "2026-04-13T14:50:25.775Z"
+    },
+    {
+      "userId": "node_qz9q9yh1v",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Student Test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_ezfyac2lo",
+      "timestamp": "2026-04-13T14:50:25.789Z"
+    },
+    {
+      "userId": "node_qz9q9yh1v",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Student Test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_a2o7jmmfo",
+      "timestamp": "2026-04-13T14:50:25.802Z"
+    },
+    {
+      "userId": "node_qz9q9yh1v",
+      "role": "pending",
+      "actionType": "LOGOUT",
+      "description": "Identity disconnected from core",
+      "timeSpent": 0,
+      "_id": "log_mbw8tfqy7",
+      "timestamp": "2026-04-13T14:50:51.494Z"
+    },
+    {
+      "userId": "node_k3hx84jl9",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Verify Student initialized connection",
+      "timeSpent": 0,
+      "_id": "log_m77obrvzn",
+      "timestamp": "2026-04-13T14:52:11.978Z"
+    },
+    {
+      "userId": "node_k3hx84jl9",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Verify Student initialized connection",
+      "timeSpent": 0,
+      "_id": "log_07nms9mi7",
+      "timestamp": "2026-04-13T14:52:12.001Z"
+    },
+    {
+      "userId": "node_k3hx84jl9",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Verify Student initialized connection",
+      "timeSpent": 0,
+      "_id": "log_r9d6ri9fh",
+      "timestamp": "2026-04-13T14:52:12.018Z"
+    },
+    {
+      "userId": "node_k3hx84jl9",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node Verify Student initialized connection",
+      "timeSpent": 0,
+      "_id": "log_sqqcwnfxu",
+      "timestamp": "2026-04-13T14:52:12.030Z"
+    },
+    {
+      "userId": "node_k3hx84jl9",
+      "role": "pending",
+      "actionType": "LOGOUT",
+      "description": "Identity disconnected from core",
+      "timeSpent": 0,
+      "_id": "log_bkf6yyb2a",
+      "timestamp": "2026-04-13T14:52:32.472Z"
+    },
+    {
+      "userId": "node_se5ozi4u9",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_lie9111k9",
+      "timestamp": "2026-04-13T14:53:31.223Z"
+    },
+    {
+      "userId": "node_se5ozi4u9",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_5zoxfl9fr",
+      "timestamp": "2026-04-13T14:53:31.233Z"
+    },
+    {
+      "userId": "node_se5ozi4u9",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_vjx4o5n2a",
+      "timestamp": "2026-04-13T14:53:31.243Z"
+    },
+    {
+      "userId": "node_se5ozi4u9",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node test initialized connection",
+      "timeSpent": 0,
+      "_id": "log_wcisg74xg",
+      "timestamp": "2026-04-13T14:53:31.253Z"
+    },
+    {
+      "userId": "node_se5ozi4u9",
+      "role": "pending",
+      "actionType": "LOGOUT",
+      "description": "Identity disconnected from core",
+      "timeSpent": 0,
+      "_id": "log_qwhe04x3m",
+      "timestamp": "2026-04-13T14:53:39.802Z"
+    },
+    {
+      "userId": "node_rx14t321x",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node realtest initialized connection",
+      "timeSpent": 0,
+      "_id": "log_dt9mahod6",
+      "timestamp": "2026-04-13T15:12:00.661Z"
+    },
+    {
+      "userId": "node_rx14t321x",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node realtest initialized connection",
+      "timeSpent": 0,
+      "_id": "log_unp1lom8g",
+      "timestamp": "2026-04-13T15:12:00.686Z"
+    },
+    {
+      "userId": "node_rx14t321x",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node realtest initialized connection",
+      "timeSpent": 0,
+      "_id": "log_afdtaqg9m",
+      "timestamp": "2026-04-13T15:12:00.696Z"
+    },
+    {
+      "userId": "node_rx14t321x",
+      "role": "pending",
+      "actionType": "LOGIN",
+      "description": "Node realtest initialized connection",
+      "timeSpent": 0,
+      "_id": "log_pvndg6lsi",
+      "timestamp": "2026-04-13T15:12:00.702Z"
     }
   ],
   "tasks": [
@@ -3924,5 +4629,6 @@
       "_id": "link_rpfkuody5",
       "createdAt": "2026-04-13T11:44:13.044Z"
     }
-  ]
+  ],
+  "milestones": []
 }

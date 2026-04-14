@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Zap, User as UserIcon, ChevronRight, Cpu } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 const Onboarding = () => {
   const [loading, setLoading] = useState(false);
@@ -19,8 +20,7 @@ const Onboarding = () => {
     }
 
     try {
-      // Relative path to current base
-      const response = await fetch('api/auth/role', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/role`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -52,7 +52,8 @@ const Onboarding = () => {
       const targetPath = role === 'parent' ? '#/parent/dashboard' : '#/dashboard';
       
       setTimeout(() => {
-        window.location.href = window.location.origin + window.location.pathname + targetPath;
+        const base = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+        window.location.href = window.location.origin + base + targetPath;
         window.location.reload();
       }, 1000);
 

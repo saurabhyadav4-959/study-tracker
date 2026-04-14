@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Zap, Mail, Lock, AlertCircle, Fingerprint } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 const Login: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -18,12 +19,11 @@ const Login: React.FC = () => {
 
     const endpoint = mode === 'login' ? 'api/auth/login' : 'api/auth/register';
     const body = mode === 'login' 
-      ? { email, password } 
-      : { name: username, email, password };
+      ? { email: email.toLowerCase().trim(), password } 
+      : { name: username, email: email.toLowerCase().trim(), password };
 
     try {
-      // Relative path to current base
-      const response = await fetch(endpoint, {
+      const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -55,7 +55,12 @@ const Login: React.FC = () => {
       if (!role || role === 'pending') {
         navigate('/onboarding');
       } else {
-        navigate(role === 'parent' ? '/parent/dashboard' : '/dashboard');
+        const targetPath = role === 'parent' ? '#/parent/dashboard' : '#/dashboard';
+        setTimeout(() => {
+          const base = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+          window.location.href = window.location.origin + base + targetPath;
+          window.location.reload();
+        }, 1000);
       }
 
     } catch (err: any) {

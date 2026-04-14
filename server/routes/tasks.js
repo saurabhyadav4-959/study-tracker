@@ -9,12 +9,12 @@ router.post('/sync', auth, async (req, res) => {
     const { tasks } = req.body;
     if (!Array.isArray(tasks)) return res.status(400).json({ message: 'INVALID DATA FORMAT' });
 
-    tasks.forEach(t => {
-      db.tasks.upsert(
+    for (const t of tasks) {
+      await db.tasks.upsert(
         { userId: req.user.id, title: t.title },
         { ...t, userId: req.user.id }
       );
-    });
+    }
 
     res.json({ message: 'TASKS SYNCHRONIZED' });
   } catch (err) {

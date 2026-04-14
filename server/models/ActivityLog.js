@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 
 const activityLogSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to student for parent view
+  _id: { type: String },
+  userId: { type: String, required: true },
+  studentId: { type: String }, // Reference to student for parent view
   role: { type: String, required: true },
   actionType: { type: String, required: true }, // LOGIN, ADD_TASK, COMPLETE_TASK, STUDY_SESSION
   description: { type: String },

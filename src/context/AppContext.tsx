@@ -1,5 +1,6 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { AppState, UserProfile, AuthUser, PersonalMaterial, Recommendation, ActivityLog, TaskStatus, Skill } from '../types';
+import { API_BASE_URL } from '../config';
 
 const generateEmptyLogs = (): ActivityLog[] => {
   const logs: ActivityLog[] = [];
@@ -86,7 +87,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (!user.token) return;
 
     try {
-      await fetch('/api/logs', {
+      await fetch(`${API_BASE_URL}/api/logs`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -144,7 +145,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       // Sync Tasks to Backend
       const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
       if (user.token && state.tasks.length > 0) {
-        fetch('/api/tasks/sync', {
+        fetch(`${API_BASE_URL}/api/tasks/sync`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',

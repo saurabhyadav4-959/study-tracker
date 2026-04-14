@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 import { User, Shield, Edit3, Save, Globe, Target, Terminal, ChevronRight, BookOpen, Layers, Music, MapPin, Crosshair, HelpCircle, Activity, Users } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import QuantumSelect from '../components/ui/QuantumSelect';
@@ -14,7 +15,7 @@ const Profile = () => {
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     if (!user.token) return;
     try {
-      const res = await fetch('/api/parent/children', {
+      const res = await fetch(`${API_BASE_URL}/api/parent/children`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const data = await res.json();
@@ -37,7 +38,7 @@ const Profile = () => {
     if (!window.confirm('WARNING: Are you sure you want to sever the neural link with this node?')) return;
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     try {
-      const res = await fetch(`/api/parent/link/${studentId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/parent/link/${studentId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${user.token}` }
       });

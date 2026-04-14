@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 import { 
   Zap, Clock, Target, Shield, Download, Filter, 
   TrendingUp, Activity, AlertCircle, CheckCircle2,
@@ -16,13 +17,13 @@ const PerformanceAnalysis = () => {
   const fetchPerformance = async () => {
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     try {
-      const res = await fetch('/api/parent/children', {
+      const res = await fetch(`${API_BASE_URL}/api/parent/children`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const data = await res.json();
       setChildren(data);
 
-      const logsRes = await fetch(`/api/logs?studentId=${selectedChild === 'all' ? '' : selectedChild}`, {
+      const logsRes = await fetch(`${API_BASE_URL}/api/logs?studentId=${selectedChild === 'all' ? '' : selectedChild}`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const logsData = await logsRes.json();
@@ -228,7 +229,7 @@ const PerformanceAnalysis = () => {
                                      const val = (e.target as HTMLInputElement).value;
                                      if (!val) return;
                                      const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
-                                     await fetch('/api/logs', {
+                                     await fetch(`${API_BASE_URL}/api/logs`, {
                                        method: 'POST',
                                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
                                        body: JSON.stringify({ actionType: 'SUPERVISOR_REMARK', description: `[FROM ${user.name}]: ${val}`, studentId: child.id })

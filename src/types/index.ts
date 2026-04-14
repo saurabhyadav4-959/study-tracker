@@ -113,6 +113,21 @@ export interface PerformanceInsights {
   overallCompletionRate: number;
 }
 
+export interface Milestone {
+  _id?: string;
+  parentId: string;
+  childId: string;
+  title: string;
+  description: string;
+  type: 'time' | 'tasks' | 'streak';
+  targetValue: number;
+  rewardBadge: string;
+  status: 'active' | 'completed';
+  progress: number;
+  completedAt?: string;
+  createdAt?: string;
+}
+
 export interface AppState {
   currentUser: AuthUser | null;
   profile: UserProfile;

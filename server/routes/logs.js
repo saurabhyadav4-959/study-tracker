@@ -7,7 +7,7 @@ const auth = require('../middleware/auth');
 router.post('/', auth, async (req, res) => {
   try {
     const { actionType, description, timeSpent, studentId } = req.body;
-    const log = db.logs.insert({
+    const log = await db.logs.insert({
       userId: req.user.id,
       role: req.user.role,
       actionType,
@@ -31,7 +31,7 @@ router.get('/', auth, async (req, res) => {
       if (studentId && studentId !== 'all') {
         query.userId = studentId;
       } else {
-        const parent = db.users.findById(req.user.id);
+        const parent = await db.users.findById(req.user.id);
         query.userId = { $in: parent.linkedChildren || [] };
       }
     } else {
@@ -45,7 +45,7 @@ router.get('/', auth, async (req, res) => {
       if (endDate) query.timestamp.$lte = endDate;
     }
 
-    const logs = db.logs.find(query);
+    const logs = await db.logs.find(query);
     res.json(logs);
   } catch (err) {
     res.status(500).json({ message: 'QUERY ERROR', error: err.message });

@@ -3,6 +3,7 @@ import {
   Activity, Clock, Zap, 
   Search, Filter, ChevronDown, MessageSquare, Check
 } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 import { ActionLog } from '../types';
 
 const SupervisorFeed = () => {
@@ -38,7 +39,7 @@ const SupervisorFeed = () => {
   const fetchFeed = async () => {
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     try {
-      const res = await fetch('/api/parent/activity-feed', {
+      const res = await fetch(`${API_BASE_URL}/api/parent/activity-feed`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const data = await res.json();

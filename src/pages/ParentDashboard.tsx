@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 import { 
   Zap, Clock, Target, Shield, Users, Search, 
   Activity, AlertCircle, TrendingUp, BarChart3,
@@ -12,6 +13,17 @@ import {
 
 const COLORS = ['#6366f1', '#a855f7', '#10b981', '#f59e0b', '#ef4444'];
 
+interface Milestone {
+  _id: string;
+  title: string;
+  description: string;
+  type: 'time' | 'tasks' | 'streak';
+  targetValue: number;
+  rewardBadge: string;
+  status: 'active' | 'completed';
+  progress: number;
+}
+
 interface ChildNode {
   id: string;
   name: string;
@@ -24,6 +36,7 @@ interface ChildNode {
   streak: number;
   latestSubject: string;
   alerts: any[];
+  milestones?: Milestone[];
 }
 
 const ParentDashboard = () => {
@@ -31,13 +44,22 @@ const ParentDashboard = () => {
   const [studentCode, setStudentCode] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [milestoneForm, setMilestoneForm] = useState({
+    childId: '',
+    title: '',
+    description: '',
+    type: 'tasks' as 'time' | 'tasks' | 'streak',
+    targetValue: 0,
+    rewardBadge: '🏅 Neural Pioneer'
+  });
+  const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
 
   const fetchChildren = async () => {
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     if (!user.token) return setLoading(false);
     
     try {
-      const res = await fetch('/api/parent/children', {
+      const res = await fetch(`${API_BASE_URL}/api/parent/children`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       
@@ -66,7 +88,7 @@ const ParentDashboard = () => {
     e.preventDefault();
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     try {
-      const res = await fetch('/api/parent/link', {
+      const res = await fetch(`${API_BASE_URL}/api/parent/link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
         body: JSON.stringify({ studentCode: studentCode.trim() })
@@ -82,7 +104,7 @@ const ParentDashboard = () => {
 
   const updateGoal = async (studentId: string, hours: number) => {
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
-    await fetch('/api/parent/set-goal', {
+    await fetch(`${API_BASE_URL}/api/parent/set-goal`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
       body: JSON.stringify({ studentId, dailyGoalHours: hours })
@@ -94,13 +116,32 @@ const ParentDashboard = () => {
     if (!window.confirm('SEVER NEURAL LINK? ALL TRACKING DATA FOR THIS NODE WILL BE DISCONNECTED.' )) return;
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     try {
-      const res = await fetch(`/api/parent/link/${studentId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/parent/link/${studentId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       if (res.ok) fetchChildren();
     } catch (err) {
       console.error('Divergence failed', err);
+    }
+  };
+
+  const handleCreateMilestone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/milestones`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
+        body: JSON.stringify(milestoneForm)
+      });
+      if (res.ok) {
+        setIsMilestoneModalOpen(false);
+        setMilestoneForm({ ...milestoneForm, title: '', description: '', targetValue: 0 });
+        fetchChildren();
+      }
+    } catch (err) {
+      console.error('Milestone deployment failed', err);
     }
   };
 
@@ -121,6 +162,12 @@ const ParentDashboard = () => {
            </div>
            <h1 className="text-5xl font-black tracking-tighter uppercase italic">Control<span className="text-primary">Center</span></h1>
            <p className="text-foreground/40 font-semibold mt-2">One screen. Full summary. Real-time tactical diagnostics.</p>
+           <button 
+             onClick={() => setIsMilestoneModalOpen(true)}
+             className="mt-6 flex items-center gap-3 px-6 py-3 bg-primary/10 border border-primary/20 rounded-xl text-primary text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all active:scale-95"
+           >
+              <Target size={14} /> Deploy Strategic Milestone
+           </button>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full lg:w-auto">
@@ -257,6 +304,28 @@ const ParentDashboard = () => {
                       <p className="text-[10px] font-black text-foreground uppercase">{child.completedTasks || 0}/{child.totalTasks || 0}</p>
                    </div>
                 </div>
+
+                {/* Active Milestones Section */}
+                {child.milestones && child.milestones.length > 0 && (
+                  <div className="mt-8 space-y-4 relative z-10 p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                     <h5 className="text-[9px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2">
+                       <Target size={12} /> Active Strategic Objectives
+                     </h5>
+                     <div className="space-y-3">
+                       {child.milestones.map(m => (
+                         <div key={m._id} className="flex justify-between items-center bg-background/50 p-3 rounded-xl border border-glass-border">
+                           <div>
+                              <p className="text-[10px] font-black uppercase">{m.title}</p>
+                              <p className="text-[8px] font-bold text-foreground/40 uppercase tracking-widest">{m.rewardBadge}</p>
+                           </div>
+                           <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase ${m.status === 'completed' ? 'bg-green-500/20 text-green-500' : 'bg-primary/20 text-primary'}`}>
+                              {m.status}
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -365,6 +434,96 @@ const ParentDashboard = () => {
                </ResponsiveContainer>
             </div>
          </div>
+
+         {/* 6. Milestone Deployment Modal */}
+         {isMilestoneModalOpen && (
+           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md text-white">
+             <div className="glass-card w-full max-w-2xl p-10 border-2 border-primary/20 animate-in zoom-in duration-300 relative overflow-hidden bg-background">
+                <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none text-primary">
+                   <Target size={200} />
+                </div>
+               <div className="flex justify-between items-center mb-10 relative z-10">
+                 <h3 className="text-3xl font-black uppercase italic tracking-tighter">Deploy <span className="text-primary">Milestone</span></h3>
+                 <button onClick={() => setIsMilestoneModalOpen(false)} className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+                    <Shield size={20} className="text-foreground/40" />
+                 </button>
+               </div>
+
+               <form onSubmit={handleCreateMilestone} className="space-y-6 relative z-10">
+                 <div className="grid grid-cols-2 gap-6">
+                   <div className="space-y-2">
+                     <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Target Node</label>
+                     <select 
+                       value={milestoneForm.childId}
+                       onChange={(e) => setMilestoneForm({...milestoneForm, childId: e.target.value})}
+                       className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground"
+                     >
+                       <option value="">SELECT STUDENT</option>
+                       {children.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                     </select>
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Protocol Type</label>
+                     <select 
+                       value={milestoneForm.type}
+                       onChange={(e) => setMilestoneForm({...milestoneForm, type: e.target.value as any})}
+                       className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground"
+                     >
+                       <option value="tasks">TASK COMPLETION</option>
+                       <option value="time">STUDY CAPACITY (MIN)</option>
+                       <option value="streak">CONSISTENCY STREAK</option>
+                     </select>
+                   </div>
+                 </div>
+
+                 <div className="space-y-2">
+                   <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Objective Title</label>
+                   <input 
+                     required
+                     value={milestoneForm.title}
+                     onChange={(e) => setMilestoneForm({...milestoneForm, title: e.target.value})}
+                     placeholder="E.G. NEURAL MASTERY: PHYSICS"
+                     className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground"
+                   />
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-6">
+                   <div className="space-y-2">
+                     <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Target Value</label>
+                     <input 
+                       type="number"
+                       required
+                       value={milestoneForm.targetValue}
+                       onChange={(e) => setMilestoneForm({...milestoneForm, targetValue: parseInt(e.target.value) || 0})}
+                       className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground"
+                     />
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Reward Badge</label>
+                     <select 
+                       value={milestoneForm.rewardBadge}
+                       onChange={(e) => setMilestoneForm({...milestoneForm, rewardBadge: e.target.value})}
+                       className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground"
+                     >
+                       <option value="🏅 Neural Pioneer">NEURAL PIONEER</option>
+                       <option value="⚡ Speed Demon">SPEED DEMON</option>
+                       <option value="🧠 Alpha Thinker">ALPHA THINKER</option>
+                       <option value="🔥 Consistency King">CONSISTENCY KING</option>
+                     </select>
+                   </div>
+                 </div>
+
+                 <button 
+                   type="submit"
+                   disabled={!milestoneForm.childId || !milestoneForm.title}
+                   className="w-full py-6 bg-primary text-white font-black uppercase tracking-[0.4em] text-[10px] rounded-2xl shadow-lg hover:shadow-primary/20 transition-all active:scale-95 disabled:opacity-30 mt-6"
+                 >
+                   Deploy Strategic Objective
+                 </button>
+               </form>
+             </div>
+           </div>
+         )}
       </div>
     </div>
   );

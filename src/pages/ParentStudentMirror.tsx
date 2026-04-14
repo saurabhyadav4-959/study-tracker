@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { API_BASE_URL } from '../config';
 import { 
   Zap, Clock, Layers, TrendingUp, 
   BarChart3, Target, Flame, Activity, Timer, ChevronRight, ChevronDown, Check
@@ -107,7 +108,7 @@ const ParentStudentMirror = () => {
   const fetchChildren = async () => {
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     try {
-      const res = await fetch('/api/parent/children', {
+      const res = await fetch(`${API_BASE_URL}/api/parent/children`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const childrenData = await res.json();
@@ -127,7 +128,7 @@ const ParentStudentMirror = () => {
     setScanLoading(true);
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     try {
-      const res = await fetch(`/api/parent/child/${childId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/parent/child/${childId}`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const deepData = await res.json();

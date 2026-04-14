@@ -1,9 +1,10 @@
 import React from 'react';
 import { 
   Zap, Clock, Layers, TrendingUp, 
-  BarChart3, Target, Flame, Activity, Timer, ChevronRight, Shield, Radio
+  BarChart3, Target, Flame, Activity, Timer, ChevronRight, Shield, Radio, CheckCircle2
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { API_BASE_URL } from '../config';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import EmptyChart from '../components/EmptyChart';
 
@@ -93,6 +94,26 @@ const Overview = () => {
     return formatChartData(state.activityLogs, timeframe);
   };
 
+  const [milestones, setMilestones] = React.useState<any[]>([]);
+
+  const fetchMilestones = async () => {
+    const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+    if (!user.token) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/milestones`, {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) setMilestones(data);
+    } catch (err) {
+      console.error('Milestone fetch failed', err);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchMilestones();
+  }, []);
+
   const hasActivity = React.useMemo(() => {
     const tasksDone = state.tasks.filter(t => t.status === 'Done').length;
     return (state.activityLogs && state.activityLogs.some(l => (l.count || 0) > 0)) || tasksDone > 0;
@@ -169,6 +190,46 @@ const Overview = () => {
         <StatCard title="Tasks Complete" value={`${tasksDone}/${totalTasks}`} subtitle="total" icon={Target} color="primary" />
         <StatCard title="Skills Mastered" value={skillsCount} subtitle="nodes" icon={Layers} color="green-400" trend={skillsCount > 0 ? 1 : 0} />
       </div>
+
+      {/* Active Milestones (Neural Goals) */}
+      {milestones.length > 0 && (
+        <div className="space-y-6">
+          <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+             <Target size={16} /> Active Neural Objectives
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {milestones.map(m => (
+              <div key={m._id} className={`glass-card p-6 border-2 relative overflow-hidden group ${m.status === 'completed' ? 'border-green-500/20 bg-green-500/5' : 'border-primary/20 bg-primary/5'}`}>
+                <div className="absolute -right-4 -top-4 opacity-5 pointer-events-none group-hover:scale-110 transition-transform">
+                   <Zap size={100} />
+                </div>
+                <div className="flex justify-between items-start mb-6 relative z-10">
+                   <div>
+                      <h4 className="text-lg font-black tracking-tight uppercase mb-1">{m.title}</h4>
+                      <div className="flex items-center gap-2">
+                         <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${m.status === 'completed' ? 'bg-green-500/20 text-green-500' : 'bg-primary/20 text-primary'}`}>
+                           {m.status}
+                         </span>
+                         <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">{m.rewardBadge}</span>
+                      </div>
+                   </div>
+                   {m.status === 'completed' && <div className="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center shadow-inner animate-in zoom-in duration-500"><CheckCircle2 size={24} /></div>}
+                </div>
+                
+                <div className="space-y-2 relative z-10">
+                   <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-foreground/40">
+                      <span>Neural Progress</span>
+                      <span>Target: {m.targetValue}</span>
+                   </div>
+                   <div className="h-2 w-full bg-foreground/5 rounded-full overflow-hidden border border-glass-border">
+                      <div className={`h-full transition-all duration-1000 ${m.status === 'completed' ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)]' : 'bg-primary'}`} style={{ width: m.status === 'completed' ? '100%' : '20%' }} />
+                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Performance Hub */}
