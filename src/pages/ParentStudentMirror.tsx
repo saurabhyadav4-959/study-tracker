@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { API_BASE_URL } from '../config';
 import { 
   Zap, Clock, Layers, TrendingUp, 
-  BarChart3, Target, Flame, Activity, Timer, ChevronRight, ChevronDown, Check
+  BarChart3, Target, Flame, Activity, Timer, ChevronRight, ChevronDown, Check, Radio
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import EmptyChart from '../components/EmptyChart';
@@ -252,8 +252,8 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
     // We map ActionLogs to ActivityLogs chart format
     const mockLogs = data.logs.map((log: any) => ({
       date: new Date(log.timestamp).toLocaleDateString('en-CA'),
-      intensity: 1, 
-      count: 1
+      productive: 1,
+      name: new Date(log.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     }));
     return formatChartData(mockLogs, timeframe);
   };
@@ -327,31 +327,67 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
             </div>
           </div>
 
-          {/* Activity Feed */}
-          <div className="glass-card p-10 border-2 border-glass-border">
-            <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-8 flex items-center gap-3">
-              <Activity size={16} />
-              Recent Node Activity
-            </h3>
-            <div className="space-y-4">
+        <div className="lg:col-span-2 space-y-12">
+          {/* Detailed Neural Activity Log */}
+          <div className="glass-card p-8 border-2 border-glass-border relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent pointer-events-none" />
+            <div className="flex justify-between items-center mb-10 relative z-10">
+              <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+                <Activity size={18} className="text-primary" />
+                Detailed Neural Activity Log
+              </h3>
+              <div className="px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">
+                Live Stream Active
+              </div>
+            </div>
+
+            <div className="space-y-4 relative z-10">
               {data.logs.length === 0 ? (
-                <p className="text-xs font-black uppercase tracking-widest text-foreground/20 text-center py-8">No recent activity detected.</p>
+                <div className="py-20 text-center space-y-4">
+                  <Radio size={40} className="mx-auto text-foreground/10 animate-pulse" />
+                  <p className="text-xs font-black uppercase tracking-[0.3em] text-foreground/20 italic">Awaiting neural transmissions...</p>
+                </div>
               ) : (
-                data.logs.map((log: any, i: number) => (
-                  <div key={i} className="flex items-center gap-4 p-4 bg-foreground/5 rounded-xl border border-glass-border group hover:bg-primary/5 transition-all">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                      <Zap size={18} />
+                <div className="grid grid-cols-1 gap-3">
+                  {data.logs.map((log: any, idx: number) => (
+                    <div key={idx} className="flex items-center gap-6 p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 hover:bg-primary/[0.02] transition-all group/item">
+                      <div className="w-12 h-12 rounded-xl bg-background border border-glass-border flex flex-col items-center justify-center shrink-0">
+                        <span className="text-[10px] font-black text-primary leading-none">
+                          {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', hour12: false })}
+                        </span>
+                        <span className="text-[8px] font-bold text-foreground/30 uppercase tracking-tighter leading-none mt-1">
+                          :{new Date(log.timestamp).toLocaleTimeString([], { minute: '2-digit' })}
+                        </span>
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-1">
+                          <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest ${
+                            log.actionType === 'LOGIN' ? 'bg-blue-500/10 text-blue-500' :
+                            log.actionType === 'COMPLETE_TASK' ? 'bg-green-500/10 text-green-500' :
+                            'bg-primary/10 text-primary'
+                          }`}>
+                            {log.actionType}
+                          </span>
+                          <span className="text-[10px] font-bold text-foreground/30 uppercase tracking-widest">
+                            {new Date(log.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                          </span>
+                        </div>
+                        <p className="text-sm font-bold text-foreground/80 truncate">{log.description}</p>
+                      </div>
+
+                      <div className="hidden md:flex flex-col items-end shrink-0">
+                        <div className="flex items-center gap-1 text-primary">
+                          <Clock size={10} />
+                          <span className="text-[10px] font-black uppercase tracking-widest">
+                            {log.timeSpent > 0 ? `${log.timeSpent}m` : 'Event'}
+                          </span>
+                        </div>
+                        <p className="text-[8px] font-black uppercase tracking-[0.2em] text-foreground/20 mt-1">Status: Logged</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-foreground">{log.actionType.replace('_', ' ')}</p>
-                      <p className="text-xs font-semibold text-foreground/50 italic">"{log.description}"</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[9px] font-black text-foreground/30 uppercase">{new Date(log.timestamp).toLocaleDateString()}</p>
-                      <p className="text-[9px] font-black text-foreground/30 uppercase">{new Date(log.timestamp).toLocaleTimeString()}</p>
-                    </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
           </div>
