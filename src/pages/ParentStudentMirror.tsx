@@ -112,10 +112,14 @@ const ParentStudentMirror = () => {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const childrenData = await res.json();
-      setChildren(childrenData);
-      if (childrenData.length > 0) {
-        setSelectedId(childrenData[0].id);
-        performDeepScan(childrenData[0].id);
+      if (Array.isArray(childrenData)) {
+        setChildren(childrenData);
+        if (childrenData.length > 0) {
+          setSelectedId(childrenData[0].id);
+          performDeepScan(childrenData[0].id);
+        }
+      } else {
+        setChildren([]);
       }
     } catch (err) {
       console.error('Failed to fetch children', err);

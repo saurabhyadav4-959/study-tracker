@@ -43,7 +43,11 @@ const SupervisorFeed = () => {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const data = await res.json();
-      setLogs(data);
+      if (Array.isArray(data)) {
+        setLogs(data);
+      } else {
+        setLogs([]);
+      }
     } catch (err) {
       console.error('Feed fetch failed', err);
     } finally {
