@@ -494,10 +494,10 @@ const ParentDashboard = () => {
                      <select 
                        value={milestoneForm.childId}
                        onChange={(e) => setMilestoneForm({...milestoneForm, childId: e.target.value})}
-                       className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground"
+                       className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236366f1%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.25em] bg-[right_1rem_center] bg-no-repeat"
                      >
-                       <option value="">SELECT STUDENT</option>
-                       {children.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                       <option value="" className="bg-[#0a0a0c]">SELECT STUDENT</option>
+                       {children.map(c => <option key={c.id} value={c.id} className="bg-[#0a0a0c]">{c.name}</option>)}
                      </select>
                    </div>
                    <div className="space-y-2">
@@ -505,11 +505,11 @@ const ParentDashboard = () => {
                      <select 
                        value={milestoneForm.type}
                        onChange={(e) => setMilestoneForm({...milestoneForm, type: e.target.value as any})}
-                       className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground"
+                       className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236366f1%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.25em] bg-[right_1rem_center] bg-no-repeat"
                      >
-                       <option value="tasks">TASK COMPLETION</option>
-                       <option value="time">STUDY CAPACITY (MIN)</option>
-                       <option value="streak">CONSISTENCY STREAK</option>
+                       <option value="tasks" className="bg-[#0a0a0c]">TASK COMPLETION</option>
+                       <option value="time" className="bg-[#0a0a0c]">STUDY CAPACITY (MIN)</option>
+                       <option value="streak" className="bg-[#0a0a0c]">CONSISTENCY STREAK</option>
                      </select>
                    </div>
                  </div>
