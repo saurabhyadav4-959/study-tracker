@@ -55,16 +55,27 @@ const BandwidthAllocation = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      {/* Dynamic Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-glass-border pb-8">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-black tracking-[0.3em] text-primary/60 uppercase">
+          <div className="flex items-center gap-2 text-[10px] font-black tracking-[0.3em] text-primary/60 uppercase mb-2">
             <Radio size={12} className="animate-pulse" />
-            Biological clock synchronized
+            Neural Link Active
           </div>
-          <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-tight">Bandwidth Allocation</h1>
-          <p className="text-foreground/40 font-semibold tracking-wide">Algorithmic priority calculation and cognitive bandwidth distribution mapping.</p>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic">Neural Sync</h1>
+          <p className="text-foreground/40 font-semibold tracking-wide max-w-xl">Algorithmic priority calculation and cognitive bandwidth distribution mapping.</p>
         </div>
+        <button 
+          onClick={() => {
+            logActivity('TEST_SIGNAL', 'Manual Neural Link Verification Successful');
+            alert('SIGNAL SENT: CHECK PARENT DASHBOARD');
+          }}
+          className="px-6 py-3 bg-primary/10 border-2 border-primary/20 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:bg-primary/20 hover:border-primary/40 transition-all shadow-[0_0_30px_rgba(99,102,241,0.1)] active:scale-95 group"
+        >
+          <span className="flex items-center gap-2">
+            <Zap size={14} className="fill-current group-hover:animate-pulse" />
+            Test Neural Link
+          </span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -164,15 +175,6 @@ const BandwidthAllocation = () => {
             )}
             <div className="absolute -top-12 -right-12 text-foreground/5 transition-transform group-hover:scale-110 duration-1000 rotate-12">
               <Timer size={180} />
-              <button 
-                onClick={() => {
-                  logActivity('TEST_SIGNAL', 'Manual Neural Link Verification Successful');
-                  alert('SIGNAL SENT: CHECK PARENT DASHBOARD');
-                }}
-                className="px-6 py-2 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:bg-primary/20 transition-all mt-4"
-              >
-                Test Neural Link
-              </button>
             </div>
           </div>
 

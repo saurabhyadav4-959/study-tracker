@@ -143,6 +143,11 @@ const ParentStudentMirror = () => {
       const res = await fetch(`${API_BASE_URL}/api/parent/child/${childId}`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
+      if (!res.ok) {
+        const errData = await res.json();
+        alert(`SYNC ERROR: ${errData.message || 'FAILED TO FETCH NODE DATA'}`);
+        return;
+      }
       const deepData = await res.json();
       console.log('[MIRROR_DEBUG] Deep Scan Result:', deepData);
       // Ensure safe fallback structures
@@ -152,6 +157,7 @@ const ParentStudentMirror = () => {
       setData(deepData);
     } catch (err) {
       console.error('Deep scan failed', err);
+      alert('NEURAL LINK ERROR: UNABLE TO ESTABLISH CONNECTION');
     } finally {
       setScanLoading(false);
     }
