@@ -10,12 +10,36 @@ import EmptyChart from '../components/EmptyChart';
 const formatChartData = (logs: any[], timeframe: string) => {
   if (!logs || logs.length === 0) return [];
   
-  // Just show the most recent logs for now to verify data flow
-  return logs.slice(-30).map(log => ({
-    name: new Date(log.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
-    productive: log.count || 0,
-    focus: (log.intensity || 0) * 10
-  }));
+  // Group logs by day
+  const dailyData: { [key: string]: { count: number, intensity: number } } = {};
+  
+  logs.forEach(log => {
+    const date = new Date(log.timestamp).toLocaleDateString('en-CA');
+    if (!dailyData[date]) {
+      dailyData[date] = { count: 0, intensity: 0 };
+    }
+    dailyData[date].count += 1;
+    dailyData[date].intensity = Math.min(4, dailyData[date].intensity + 1);
+  });
+
+  const today = new Date();
+  const result = [];
+  
+  // Last 7 days for 'W' view
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(today.getDate() - i);
+    const ds = d.toLocaleDateString('en-CA');
+    const dayData = dailyData[ds] || { count: 0, intensity: 0 };
+    
+    result.push({
+      name: d.toLocaleDateString('en-US', { weekday: 'short' }),
+      productive: dayData.count,
+      focus: dayData.intensity * 10
+    });
+  }
+  
+  return result;
 };
 
 const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }: any) => (
@@ -247,11 +271,12 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
           <div className="glass-card p-10 border-2 border-glass-border relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent pointer-events-none" />
             <div className="flex justify-between items-center mb-12 relative z-10">
-              <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
-                <BarChart3 size={16} />
-                Action Node Timeline
-              </h3>
-              <div className="flex gap-2">
+              <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-8 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <BarChart3 size={16} />
+                  Neural Flux Capacitors
+                </div>
+                <div className="flex gap-2">
                 {['W', 'M', 'Y'].map(t => (
                   <button 
                     key={t} 
