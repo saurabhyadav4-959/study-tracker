@@ -129,11 +129,40 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         // Initial Login Log
         logActivity('LOGIN', `Node ${user.name} initialized connection`);
         
+        // Initial Restriction Check
+        checkRestrictions();
+        const statusInterval = setInterval(checkRestrictions, 15000); // Check every 15s
+        return () => clearInterval(statusInterval);
+        
       } catch (e) {
         console.error("Failed to parse active user session", e);
       }
     }
   }, []);
+
+  const checkRestrictions = async () => {
+    const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+    if (!user.token || user.role !== 'student') return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/status`, {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      const data = await res.json();
+      if (data.restrictions) {
+        setState(prev => ({
+          ...prev,
+          profile: {
+            ...prev.profile,
+            isLocked: data.restrictions.isLocked,
+            lockMessage: data.restrictions.lockMessage
+          }
+        }));
+      }
+    } catch (err) {
+      console.error('Restriction check failed', err);
+    }
+  };
 
   // Sync state changes to local storage AND backend
   React.useEffect(() => {
