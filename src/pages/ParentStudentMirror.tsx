@@ -301,15 +301,47 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
                          <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
-                    <XAxis dataKey="name" stroke="#ffffff30" tick={{ fill: '#ffffff60', fontSize: 10, fontWeight: 900 }} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#ffffff30" tick={{ fill: '#ffffff60', fontSize: 10, fontWeight: 900 }} tickLine={false} axisLine={false} />
-                    <Tooltip contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--glass-border)', borderRadius: '12px' }} itemStyle={{ color: 'var(--foreground)', fontWeight: 900 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.05} vertical={false} />
+                    <XAxis dataKey="name" stroke="currentColor" opacity={0.3} tick={{ fill: 'currentColor', fontSize: 10, fontWeight: 900, opacity: 0.6 }} tickLine={false} axisLine={false} />
+                    <YAxis stroke="currentColor" opacity={0.3} tick={{ fill: 'currentColor', fontSize: 10, fontWeight: 900, opacity: 0.6 }} tickLine={false} axisLine={false} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--glass-border)', borderRadius: '12px' }} 
+                      itemStyle={{ color: 'var(--foreground)', fontWeight: 900 }} 
+                    />
                     <Area type="monotone" dataKey="productive" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorProd)" />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
                 <EmptyChart height="100%" />
+              )}
+            </div>
+          </div>
+
+          {/* Activity Feed */}
+          <div className="glass-card p-10 border-2 border-glass-border">
+            <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-8 flex items-center gap-3">
+              <Activity size={16} />
+              Recent Node Activity
+            </h3>
+            <div className="space-y-4">
+              {data.logs.length === 0 ? (
+                <p className="text-xs font-black uppercase tracking-widest text-foreground/20 text-center py-8">No recent activity detected.</p>
+              ) : (
+                data.logs.map((log: any, i: number) => (
+                  <div key={i} className="flex items-center gap-4 p-4 bg-foreground/5 rounded-xl border border-glass-border group hover:bg-primary/5 transition-all">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                      <Zap size={18} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-foreground">{log.actionType.replace('_', ' ')}</p>
+                      <p className="text-xs font-semibold text-foreground/50 italic">"{log.description}"</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[9px] font-black text-foreground/30 uppercase">{new Date(log.timestamp).toLocaleDateString()}</p>
+                      <p className="text-[9px] font-black text-foreground/30 uppercase">{new Date(log.timestamp).toLocaleTimeString()}</p>
+                    </div>
+                  </div>
+                ))
               )}
             </div>
           </div>
