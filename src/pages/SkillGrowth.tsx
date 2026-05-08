@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Rocket, Box, Database, Cpu, ChevronRight, TrendingUp, Medal, Activity, Radio, Target, Plus, CheckCircle2, MoreVertical, Layers } from 'lucide-react';
+import { Rocket, Box, Database, Cpu, ChevronRight, TrendingUp, Medal, Activity, Radio, Target, Plus, CheckCircle2, MoreVertical, Layers, Zap, Timer, Flame, BrainCircuit } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { Priority } from '../types';
 
@@ -9,7 +9,7 @@ const SkillEvolution = () => {
   const [isInitializingSkill, setIsInitializingSkill] = useState(false);
   const [newTarget, setNewTarget] = useState({
     title: '',
-    skillId: '',
+    skillName: '',
     deadline: new Date().toISOString().split('T')[0],
   });
   const [newSkillData, setNewSkillData] = useState({
@@ -18,14 +18,21 @@ const SkillEvolution = () => {
   });
 
   const handleAddTarget = () => {
-    if (!newTarget.title || !newTarget.skillId) return;
-    const selectedSkill = state.skills.find(s => s.id === newTarget.skillId);
-    if (!selectedSkill) return;
+    if (!newTarget.title || !newTarget.skillName) return;
+    
+    // Check if skill exists, if not, initialize it automatically
+    const skillExists = state.skills.some(s => s.name.toLowerCase() === newTarget.skillName.toLowerCase());
+    if (!skillExists) {
+      dispatch.addSkill({
+        name: newTarget.skillName,
+        category: 'Core Logic'
+      });
+    }
 
     dispatch.addTask({
       id: Math.random().toString(36).substr(2, 9),
       title: newTarget.title,
-      track: selectedSkill.name, // Use skill name as track
+      track: newTarget.skillName, // Use typed skill name as track
       deadline: newTarget.deadline,
       priority: 'High' as Priority,
       status: 'Todo'
@@ -33,7 +40,7 @@ const SkillEvolution = () => {
     
     setNewTarget({
       title: '',
-      skillId: '',
+      skillName: '',
       deadline: new Date().toISOString().split('T')[0],
     });
     setShowForm(false);
@@ -67,30 +74,30 @@ const SkillEvolution = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       {/* Dynamic Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 border-b border-glass-border pb-8">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-black tracking-[0.3em] text-primary/60 uppercase">
+          <div className="flex items-center gap-2 text-[10px] font-black tracking-[0.3em] text-primary/60 uppercase">
             <Radio size={12} className="animate-pulse" />
             Skill matrix synchronization active
           </div>
-          <h1 className="text-5xl font-black tracking-tighter uppercase leading-tight">Skill Evolution</h1>
-          <p className="text-foreground/40 font-semibold tracking-wide">Monitor your technical talent pulse and neural evolution across all core skill nodes.</p>
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-tight">Skill Evolution</h1>
+          <p className="text-xs md:text-sm text-foreground/40 font-semibold tracking-wide">Monitor your technical talent pulse and neural evolution across all core skill nodes.</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
           <button 
             onClick={() => setShowForm(!showForm)}
-            className="px-6 py-3 bg-primary/10 text-primary border border-primary/20 font-black uppercase tracking-[0.2em] text-[10px] rounded-xl hover:bg-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+            className="px-6 py-4 bg-primary/10 text-primary border border-primary/20 font-black uppercase tracking-[0.2em] text-xs rounded-xl hover:bg-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 flex-1 sm:flex-none"
           >
             <Plus size={14} />
             <span>{showForm ? 'Cancel Sync' : 'Set Skill Target'}</span>
           </button>
-          <div className="glass-card px-8 py-4 border-2 border-yellow-500/20 flex items-center gap-4 bg-yellow-500/5 shadow-[0_0_20px_rgba(234,179,8,0.05)]">
+          <div className="glass-card px-6 py-3 md:px-8 md:py-4 border-2 border-yellow-500/20 flex items-center justify-center sm:justify-start gap-4 bg-yellow-500/5 shadow-[0_0_20px_rgba(234,179,8,0.05)]">
             <Medal className="text-yellow-500 animate-bounce" size={24} />
             <div className="flex flex-col">
-              <span className="text-sm font-black uppercase tracking-[0.2em] text-yellow-500/60">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-500/60">
                 Mastery Level
               </span>
-              <span className="text-xl font-black text-foreground leading-none uppercase">{getRank(totalXP)}</span>
+              <span className="text-lg md:text-xl font-black text-foreground leading-none uppercase">{getRank(totalXP)}</span>
             </div>
           </div>
         </div>
@@ -111,16 +118,12 @@ const SkillEvolution = () => {
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/40 ml-1">Assigned Skill Node</label>
-                <select
-                  value={newTarget.skillId}
-                  onChange={e => setNewTarget({...newTarget, skillId: e.target.value})}
-                  className="w-full bg-background border border-glass-border rounded-xl px-5 py-4 text-xs font-black uppercase tracking-widest text-foreground outline-none focus:border-primary appearance-none cursor-pointer"
-                >
-                  <option className="bg-background text-foreground" value="" disabled>Select Skill...</option>
-                  {state.skills.map(skill => (
-                    <option className="bg-background text-foreground" key={skill.id} value={skill.id}>{skill.name}</option>
-                  ))}
-                </select>
+                <input 
+                  value={newTarget.skillName}
+                  onChange={e => setNewTarget({...newTarget, skillName: e.target.value})}
+                  className="quantum-input font-black uppercase placeholder:text-foreground/30 text-sm"
+                  placeholder="e.g. PYTHON, REACT, DSA..."
+                />
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/40 ml-1">Deadline Date</label>
@@ -155,20 +158,23 @@ const SkillEvolution = () => {
             
             <div className="space-y-8 relative z-10">
               {state.skills.map((skill) => (
-                <div key={skill.id} className="group p-6 rounded-2xl bg-foreground/[0.02] border border-glass-border hover:bg-primary/[0.03] hover:border-primary/30 transition-all duration-500">
-                  <div className="flex justify-between items-end mb-6">
-                    <div className="flex items-center gap-6">
-                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner border border-primary/10">
-                        <Box size={24} />
+                <div key={skill.id} className="group p-5 md:p-6 rounded-2xl bg-foreground/[0.02] border border-glass-border hover:bg-primary/[0.03] hover:border-primary/30 transition-all duration-500">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-6">
+                    <div className="flex items-center gap-4 md:gap-6">
+                      <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner border border-primary/10 shrink-0">
+                        <Box size={22} className="md:size-[24px]" />
                       </div>
-                      <div>
-                        <h4 className="text-xl font-black tracking-tight uppercase group-hover:text-primary transition-colors text-foreground">{skill.name}</h4>
-                        <p className="text-sm text-foreground/50 font-black uppercase tracking-[0.2em] mt-1">{skill.category} • {skill.streak} Day Neural Sync</p>
+                      <div className="min-w-0">
+                        <h4 className="text-lg md:text-xl font-black tracking-tight uppercase group-hover:text-primary transition-colors text-foreground truncate">{skill.name}</h4>
+                        <p className="text-[10px] md:text-sm text-foreground/50 font-black uppercase tracking-[0.2em] mt-1 truncate">{skill.category} • {skill.streak} Day Neural Sync</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <span className="text-2xl font-black text-foreground">{skill.progress}%</span>
-                      <p className="text-xs font-black uppercase tracking-widest text-foreground/40 italic">Mastery Completion</p>
+                    <div className="text-left sm:text-right w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-white/5 flex sm:flex-col justify-between items-end sm:items-end">
+                      <div className="sm:hidden text-[10px] font-black uppercase tracking-widest text-foreground/40 italic">Sync Rate</div>
+                      <div>
+                        <span className="text-xl md:text-2xl font-black text-foreground">{skill.progress}%</span>
+                        <p className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-foreground/40 italic">Mastery Completion</p>
+                      </div>
                     </div>
                   </div>
                   <div className="w-full h-3 bg-foreground/5 rounded-full overflow-hidden p-0.5 border border-glass-border relative">
@@ -189,20 +195,26 @@ const SkillEvolution = () => {
               <Database size={16} />
               Talent Pulse Matrix
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
               {[
-                { label: 'Logic', val: avgProgress + 5 },
-                { label: 'Architecture', val: Math.min(100, (skillCount * 15)) },
-                { label: 'Creativity', val: Math.min(100, (tasksDone * 8)) },
-                { label: 'Focus', val: Math.min(100, Math.round(state.pomodoro.totalMinutes / 6)) },
-                { label: 'Stability', val: consistencyVelocity },
-                { label: 'Speed', val: Math.max(0, 100 - (totalTasks - tasksDone) * 5) },
-                { label: 'Complexity', val: Math.min(100, state.skills.filter(s => s.progress > 80).length * 25) },
-                { label: 'Persistence', val: Math.min(100, consistencyVelocity + 10) },
+                { label: 'Logic', val: avgProgress + 5, icon: Cpu, color: 'text-blue-500' },
+                { label: 'Architecture', val: Math.min(100, (skillCount * 15)), icon: Layers, color: 'text-primary' },
+                { label: 'Creativity', val: Math.min(100, (tasksDone * 8)), icon: Zap, color: 'text-yellow-500' },
+                { label: 'Focus', val: Math.min(100, Math.round(state.pomodoro.totalMinutes / 6)), icon: Target, color: 'text-red-500' },
+                { label: 'Stability', val: consistencyVelocity, icon: Activity, color: 'text-green-500' },
+                { label: 'Speed', val: Math.max(0, 100 - (totalTasks - tasksDone) * 5), icon: Timer, color: 'text-secondary' },
+                { label: 'Complexity', val: Math.min(100, state.skills.filter(s => s.progress > 80).length * 25), icon: BrainCircuit, color: 'text-purple-500' },
+                { label: 'Persistence', val: Math.min(100, consistencyVelocity + 10), icon: Flame, color: 'text-orange-500' },
               ].map((stat, idx) => (
-                <div key={idx} className="p-6 bg-white/5 rounded-2xl border border-glass-border flex flex-col items-center text-center group hover:bg-white/10 hover:border-primary/40 transition-all duration-500">
-                  <p className="text-sm text-foreground/50 font-black uppercase tracking-[0.2em] mb-3 group-hover:text-primary transition-colors">{stat.label}</p>
-                  <p className="text-3xl font-black text-foreground tracking-widest leading-none">{stat.val}</p>
+                <div key={idx} className="p-4 md:p-6 bg-white/[0.03] rounded-2xl border border-glass-border flex flex-col items-center text-center group hover:bg-white/[0.06] hover:border-primary/40 transition-all duration-500 relative overflow-hidden">
+                  <div className={`absolute -right-2 -top-2 opacity-5 group-hover:opacity-10 transition-opacity ${stat.color}`}>
+                    <stat.icon size={64} />
+                  </div>
+                  <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white/5 flex items-center justify-center mb-4 ${stat.color} group-hover:scale-110 transition-transform`}>
+                    <stat.icon size={18} className="md:size-[20px]" />
+                  </div>
+                  <p className="text-[9px] md:text-[10px] text-foreground/50 font-black uppercase tracking-[0.2em] mb-1 group-hover:text-primary transition-colors">{stat.label}</p>
+                  <p className="text-xl md:text-2xl font-black text-foreground tracking-widest leading-none">{stat.val}</p>
                 </div>
               ))}
             </div>

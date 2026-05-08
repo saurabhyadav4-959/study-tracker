@@ -60,18 +60,18 @@ const Profile = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       {/* Header section with specific breadcrumb */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-glass-border pb-8">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-black tracking-[0.3em] text-primary/60 uppercase">
+          <div className="flex items-center gap-2 text-[10px] font-black tracking-[0.3em] text-primary/60 uppercase">
             <Activity size={12} className="animate-pulse" />
             Operational Mode • Mar 14, 2026
           </div>
-          <h1 className="text-5xl font-black tracking-tighter uppercase leading-tight text-foreground">Identity Manager</h1>
-          <p className="text-foreground/40 font-semibold tracking-wide">Personalize your system identity and academic data.</p>
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-tight text-foreground">Identity Manager</h1>
+          <p className="text-xs md:text-sm text-foreground/40 font-semibold tracking-wide">Personalize your system identity and academic data.</p>
         </div>
         <button 
           onClick={isEditing ? handleSave : () => setIsEditing(true)}
-          className={`group flex items-center gap-3 px-10 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-sm transition-all duration-500 hover:scale-[1.02] active:scale-95 ${
+          className={`group flex items-center justify-center gap-3 px-6 md:px-10 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs md:text-sm transition-all duration-500 hover:scale-[1.02] active:scale-95 w-full md:w-auto ${
             isEditing 
               ? 'bg-green-500/10 border-2 border-green-500 text-green-500 shadow-[0_0_30px_rgba(34,197,94,0.2)]' 
               : 'bg-primary/10 border-2 border-primary text-primary shadow-[0_0_30px_rgba(99,102,241,0.2)]'
@@ -282,18 +282,18 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="glass-card p-10 flex items-center justify-between group cursor-pointer hover:bg-primary/[0.05] border-2 border-glass-border">
-            <div className="flex items-center gap-8">
-              <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-105 transition-all shadow-inner">
-                <HelpCircle size={36} />
+          <div className="glass-card p-6 md:p-10 flex flex-col sm:flex-row items-center justify-between group cursor-pointer hover:bg-primary/[0.05] border-2 border-glass-border gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6 md:gap-8 text-center sm:text-left">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-3xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-105 transition-all shadow-inner">
+                <HelpCircle size={32} className="md:size-[36px]" />
               </div>
               <div>
-                <h4 className="text-2xl font-black tracking-tight mb-1">Advanced Diagnostics</h4>
-                <p className="text-sm text-foreground/40 font-semibold tracking-wide uppercase">Review system metrics and biological sync status</p>
+                <h4 className="text-xl md:text-2xl font-black tracking-tight mb-1">Advanced Diagnostics</h4>
+                <p className="text-[10px] md:text-sm text-foreground/40 font-semibold tracking-wide uppercase leading-relaxed max-w-[200px] md:max-w-none">Review system metrics and biological sync status</p>
               </div>
             </div>
-            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white/30 group-hover:bg-primary group-hover:text-white transition-all">
-              <ChevronRight size={32} />
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white/30 group-hover:bg-primary group-hover:text-white transition-all self-end sm:self-auto">
+              <ChevronRight size={28} className="md:size-[32px]" />
             </div>
           </div>
 

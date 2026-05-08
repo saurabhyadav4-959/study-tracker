@@ -37,7 +37,9 @@ const Login: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'NEURAL SYNCHRONIZATION FAILED');
+        let errorMessage = data.message || 'NEURAL SYNCHRONIZATION FAILED';
+        if (data.tip) errorMessage += ` - ${data.tip}`;
+        throw new Error(errorMessage);
       }
 
       // Store in local storage

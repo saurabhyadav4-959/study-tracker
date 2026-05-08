@@ -91,19 +91,19 @@ const Onboarding = () => {
             { 
               id: 'student', 
               icon: UserIcon, 
-              title: 'Student', 
+              title: 'Student Node', 
               color: 'primary', 
-              desc: 'Optimize academic trajectories, manage tasks, and streamline deep focus cycles. Identity shared via unique neural code.',
+              desc: 'Optimize academic trajectories, manage tasks, and streamline deep focus cycles. You will receive a UNIQUE NEURAL CODE to share with your supervisor/parent.',
               action: 'Initialize Student Protocol',
               accent: <Zap size={160} className="text-primary group-hover:scale-110 transition-transform duration-1000" />
             },
             { 
               id: 'parent', 
               icon: Shield, 
-              title: 'Parent', 
+              title: 'Parent / Supervisor', 
               color: 'secondary', 
-              desc: 'Oversee student progress, analyze performance metrics, and assign strategic milestones via standard neural links.',
-              action: 'Initialize Parent Protocol',
+              desc: 'Oversee student progress, analyze performance metrics, and assign strategic milestones. Use the UNIQUE CODE from your student to establish a link.',
+              action: 'Initialize Supervisor Protocol',
               accent: <Shield size={160} className="text-secondary group-hover:scale-110 transition-transform duration-1000" />
             }
           ].map((node) => (
@@ -120,7 +120,7 @@ const Onboarding = () => {
               
               <div className="relative z-10 space-y-8">
                 <div className={`w-20 h-20 bg-${node.color}/10 rounded-3xl flex items-center justify-center text-${node.color} border border-${node.color}/20 group-hover:scale-105 transition-all duration-500 shadow-inner group-hover:shadow-${node.color}/20`}>
-                  <node.icon size={40} />
+                   <node.icon size={40} />
                 </div>
                 
                 <div className="space-y-4">

@@ -37,6 +37,11 @@ interface ChildNode {
   latestSubject: string;
   alerts: any[];
   milestones?: Milestone[];
+  restrictions?: {
+    isLocked: boolean;
+    dailyGoalHours: number;
+    lockMessage: string;
+  };
 }
 
 const ParentDashboard = () => {
@@ -145,6 +150,20 @@ const ParentDashboard = () => {
     }
   };
 
+  const toggleLock = async (studentId: string, currentLock: boolean) => {
+    const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/parent/restrictions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
+        body: JSON.stringify({ studentId, isLocked: !currentLock })
+      });
+      if (res.ok) fetchChildren();
+    } catch (err) {
+      console.error('Lock toggle failed', err);
+    }
+  };
+
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-rotate" /></div>;
 
   const totalAggregatedTime = children.reduce((acc, c) => acc + (c.studyMinutesToday || 0), 0);
@@ -160,8 +179,8 @@ const ParentDashboard = () => {
            <div className="flex items-center gap-2 text-[10px] font-black tracking-[0.3em] text-primary/60 uppercase mb-2">
              <Shield size={12} /> Supervisor Hub • v0.2
            </div>
-           <h1 className="text-5xl font-black tracking-tighter uppercase italic">Control<span className="text-primary">Center</span></h1>
-           <p className="text-foreground/40 font-semibold mt-2">One screen. Full summary. Real-time tactical diagnostics.</p>
+           <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">Control<span className="text-primary">Center</span></h1>
+           <p className="text-xs md:text-sm text-foreground/40 font-semibold mt-2">One screen. Full summary. Real-time tactical diagnostics.</p>
            <button 
              onClick={() => setIsMilestoneModalOpen(true)}
              className="mt-6 flex items-center gap-3 px-6 py-3 bg-primary/10 border border-primary/20 rounded-xl text-primary text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all active:scale-95"
@@ -211,24 +230,24 @@ const ParentDashboard = () => {
 
       {/* 3. Student Nodes (THE CORE) */}
       <div className="space-y-6">
-        <div className="flex justify-between items-center px-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-2 gap-4">
            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/40 flex items-center gap-2">
              <Activity size={14} /> Active Node Matrix
            </h3>
-           <form onSubmit={handleLink} className="flex gap-3 relative z-20 items-stretch h-14">
-              <div className="relative flex-1 min-w-[280px]">
+           <form onSubmit={handleLink} className="flex flex-col sm:flex-row gap-3 relative z-20 items-stretch w-full sm:w-auto">
+              <div className="relative flex-1 sm:min-w-[280px]">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40" size={16} />
                 <input 
                   value={studentCode}
                   onChange={(e) => setStudentCode(e.target.value)}
-                  placeholder="ENTER STUDENT UNIQUE ID (E.G. STU-XXXXX)" 
-                  className="w-full h-full bg-background border-2 border-glass-border rounded-2xl pl-12 pr-6 text-[10px] font-black uppercase tracking-widest outline-none focus:border-primary/40 focus:bg-foreground/5 transition-all cursor-text placeholder:text-foreground/20 text-foreground" 
+                  placeholder="ENTER STUDENT UNIQUE ID..." 
+                  className="w-full h-12 md:h-14 bg-background border-2 border-glass-border rounded-2xl pl-12 pr-6 text-[10px] font-black uppercase tracking-widest outline-none focus:border-primary/40 focus:bg-foreground/5 transition-all cursor-text placeholder:text-foreground/20 text-foreground" 
                 />
               </div>
               <button 
                 type="submit"
                 disabled={!studentCode}
-                className="bg-primary hover:bg-primary/80 text-white px-8 rounded-2xl flex items-center gap-3 transition-all active:scale-95 disabled:opacity-30 disabled:pointer-events-none group shadow-[0_10px_30px_rgba(99,102,241,0.2)] hover:shadow-[0_15px_40px_rgba(99,102,241,0.4)]"
+                className="h-12 md:h-14 bg-primary hover:bg-primary/80 text-white px-6 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-30 disabled:pointer-events-none group shadow-[0_10px_30px_rgba(99,102,241,0.2)] hover:shadow-[0_15px_40px_rgba(99,102,241,0.4)]"
               >
                 <Users size={18} className="group-hover:scale-110 transition-transform" />
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap">Connect Node</span>
@@ -249,14 +268,14 @@ const ParentDashboard = () => {
                 </div>
                 
                 <div className="flex justify-between items-start relative z-10 mb-8">
-                   <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                         <h4 className="text-3xl font-black tracking-tighter uppercase italic">{child.name}</h4>
+                   <div className="space-y-1 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                         <h4 className="text-2xl md:text-3xl font-black tracking-tighter uppercase italic">{child.name}</h4>
                          <div className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${child.streak > 7 ? 'bg-orange-500/10 text-orange-500' : 'bg-foreground/5 text-foreground/40'}`}>
                            {child.streak} DAY STREAK
                          </div>
                       </div>
-                      <p className="text-[10px] font-black text-foreground/30 uppercase tracking-[0.2em]">{child.email}</p>
+                      <p className="text-[10px] font-black text-foreground/30 uppercase tracking-[0.2em] truncate max-w-[200px] sm:max-w-none">{child.email}</p>
                    </div>
                    <div className="text-right">
                       <div className="flex items-center justify-end gap-2 mb-1">
@@ -326,6 +345,25 @@ const ParentDashboard = () => {
                      </div>
                   </div>
                 )}
+
+                {/* Restrictions Controls */}
+                <div className="mt-6 pt-6 border-t border-glass-border flex items-center justify-between relative z-10">
+                   <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${child.restrictions?.isLocked ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'bg-foreground/5 text-foreground/20'}`}>
+                         <Shield size={16} />
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-black uppercase">Dashboard Lock</p>
+                         <p className="text-[8px] font-bold text-foreground/30 uppercase">{child.restrictions?.isLocked ? 'PROTOCOL RESTRICTED' : 'PROTOCOL ACTIVE'}</p>
+                      </div>
+                   </div>
+                   <button 
+                     onClick={() => toggleLock(child.id, child.restrictions?.isLocked || false)}
+                     className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${child.restrictions?.isLocked ? 'bg-green-500/10 text-green-500 border border-green-500/20 hover:bg-green-500 hover:text-white' : 'bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white'}`}
+                   >
+                      {child.restrictions?.isLocked ? 'Unlock Node' : 'Restrict Node'}
+                   </button>
+                </div>
               </div>
             );
           })}
@@ -337,7 +375,7 @@ const ParentDashboard = () => {
         <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/40 flex items-center gap-2 px-2">
           <Layers size={14} /> Node Management Registry
         </h3>
-        <div className="glass-card overflow-hidden border-2 border-glass-border">
+        <div className="glass-card overflow-x-auto border-2 border-glass-border">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-white/5 border-b border-glass-border">
@@ -450,7 +488,7 @@ const ParentDashboard = () => {
                </div>
 
                <form onSubmit={handleCreateMilestone} className="space-y-6 relative z-10">
-                 <div className="grid grid-cols-2 gap-6">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                    <div className="space-y-2">
                      <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Target Node</label>
                      <select 
@@ -487,7 +525,7 @@ const ParentDashboard = () => {
                    />
                  </div>
 
-                 <div className="grid grid-cols-2 gap-6">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                    <div className="space-y-2">
                      <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Target Value</label>
                      <input 

@@ -34,16 +34,16 @@ const SuccessMetrics = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       {/* Dynamic Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-glass-border pb-8">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-black tracking-[0.3em] text-primary/60 uppercase">
+          <div className="flex items-center gap-2 text-[10px] font-black tracking-[0.3em] text-primary/60 uppercase">
             <Radio size={12} className="animate-pulse" />
             Predictive Analytics Protocol Online
           </div>
-          <h1 className="text-5xl font-black tracking-tighter uppercase leading-tight">Success Metrics</h1>
-          <p className="text-foreground/40 font-semibold tracking-wide">Deep analytical synthesis of your cognitive and academic performance vectors.</p>
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-tight">Success Metrics</h1>
+          <p className="text-xs md:text-sm text-foreground/40 font-semibold tracking-wide">Deep analytical synthesis of your cognitive and academic performance vectors.</p>
         </div>
-        <button className="px-8 py-4 bg-white/5 border border-glass-border text-foreground/60 font-black uppercase tracking-[0.2em] text-xs rounded-2xl hover:bg-white/10 hover:text-white transition-all shadow-inner">
+        <button className="px-6 md:px-8 py-4 bg-white/5 border border-glass-border text-foreground/60 font-black uppercase tracking-[0.2em] text-xs rounded-2xl hover:bg-white/10 hover:text-white transition-all shadow-inner w-full md:w-auto">
           Export DNA Report
         </button>
       </div>

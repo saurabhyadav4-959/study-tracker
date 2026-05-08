@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Zap, Clock, Layers, TrendingUp, 
-  BarChart3, Target, Flame, Activity, Timer, ChevronRight, Shield, Radio, CheckCircle2
+  BarChart3, Target, Flame, Activity, Timer, ChevronRight, Shield, Radio, CheckCircle2, Key
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { API_BASE_URL } from '../config';
@@ -64,23 +64,23 @@ const formatChartData = (logs: any[], timeframe: string) => {
 };
 
 const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }: any) => (
-  <div className="glass-card p-8 border-2 border-glass-border glass-card-hover relative overflow-hidden group">
-    <div className={`absolute -right-4 -top-4 w-24 h-24 bg-${color}/5 rounded-full blur-3xl group-hover:bg-${color}/10 transition-all duration-500`} />
-    <div className="flex justify-between items-start mb-8 relative z-10">
-      <div className={`w-14 h-14 rounded-2xl bg-${color}/10 text-${color === 'primary' ? 'primary' : color} flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform`}>
-        <Icon size={28} />
+  <div className="glass-card p-5 md:p-8 border-2 border-glass-border glass-card-hover relative overflow-hidden group">
+    <div className={`absolute -right-4 -top-4 w-20 h-20 md:w-24 md:h-24 bg-${color}/5 rounded-full blur-3xl group-hover:bg-${color}/10 transition-all duration-500`} />
+    <div className="flex justify-between items-start mb-6 md:mb-8 relative z-10">
+      <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-${color}/10 text-${color === 'primary' ? 'primary' : color} flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform`}>
+        <Icon size={24} className="md:size-[28px]" />
       </div>
       {trend && (
-        <div className={`flex items-center gap-1 font-black text-xs tracking-tighter px-2.5 py-1 rounded-full ${trend > 0 ? 'bg-green-500/10 text-green-500 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : 'bg-red-500/10 text-red-500'}`}>
+        <div className={`flex items-center gap-1 font-black text-[9px] md:text-xs tracking-tighter px-2 py-0.5 md:px-2.5 md:py-1 rounded-full ${trend > 0 ? 'bg-green-500/10 text-green-500 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : 'bg-red-500/10 text-red-500'}`}>
           {trend > 0 ? '▲' : '▼'} {Math.abs(trend)}%
         </div>
       )}
     </div>
     <div className="space-y-1 relative z-10">
-      <p className="text-xs font-black uppercase tracking-[0.3em] text-foreground/50">{title}</p>
+      <p className="text-[9px] md:text-xs font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-foreground/50">{title}</p>
       <div className="flex items-baseline gap-2">
-        <h3 className="text-4xl font-black tracking-tighter text-foreground">{value}</h3>
-        {subtitle && <span className="text-xs font-bold text-foreground/40 uppercase tracking-widest">{subtitle}</span>}
+        <h3 className="text-3xl md:text-4xl font-black tracking-tighter text-foreground">{value}</h3>
+        {subtitle && <span className="text-[9px] md:text-xs font-bold text-foreground/40 uppercase tracking-widest">{subtitle}</span>}
       </div>
     </div>
   </div>
@@ -89,6 +89,24 @@ const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }: any) => 
 const Overview = () => {
   const { state, dispatch } = useAppContext();
   const [timeframe, setTimeframe] = React.useState('W');
+  const [restrictions, setRestrictions] = React.useState<any>(null);
+  const [loadingStatus, setLoadingStatus] = React.useState(true);
+
+  const fetchStatus = async () => {
+    const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+    if (!user.token) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/status`, {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      const data = await res.json();
+      if (data.restrictions) setRestrictions(data.restrictions);
+    } catch (err) {
+      console.error('Status fetch failed', err);
+    } finally {
+      setLoadingStatus(false);
+    }
+  };
 
   const getActiveData = () => {
     return formatChartData(state.activityLogs, timeframe);
@@ -112,6 +130,7 @@ const Overview = () => {
 
   React.useEffect(() => {
     fetchMilestones();
+    fetchStatus();
   }, []);
 
   const hasActivity = React.useMemo(() => {
@@ -136,55 +155,113 @@ const Overview = () => {
   const focusScore = Math.min(100, Math.round((focusMinutes / 300) * 100)); // 300 mins as 100% bench
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      {/* Dynamic Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-glass-border pb-8">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-black tracking-[0.3em] text-primary/60 uppercase">
-            <Radio size={12} className="animate-pulse" />
-            System Live • Node {state.currentUser?.id.substring(0, 8) || 'Alpha-01'}
-          </div>
-          <h1 className="text-5xl font-black tracking-tighter uppercase leading-tight">System Overview</h1>
-          <div className="flex flex-wrap gap-4 items-center">
-            <p className="text-foreground/40 font-semibold tracking-wide">Synthesizing real-time diagnostics of your academic OS.</p>
-            {state.currentUser?.studentCode && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-xl">
-                 <Shield size={10} className="text-primary" />
-                 <span className="text-[10px] font-black uppercase tracking-widest text-primary">Student Code:</span>
-                 <span className="text-[10px] font-black tracking-widest text-foreground select-all">{state.currentUser.studentCode}</span>
+    <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 relative">
+      {/* 0. Restricted Mode Overlay */}
+      {restrictions?.isLocked && (
+        <div className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-500">
+           <div className="max-w-2xl w-full glass-card p-8 md:p-16 border-2 border-red-500/30 text-center space-y-6 md:space-y-10 relative overflow-hidden">
+              <div className="absolute inset-0 bg-red-500/5 animate-pulse-slow pointer-events-none" />
+              <div className="relative z-10">
+                <div className="w-16 h-16 md:w-24 md:h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8 border-2 border-red-500/20 shadow-[0_0_50px_rgba(239,68,68,0.2)]">
+                  <Shield size={32} className="text-red-500 md:size-[48px]" />
+                </div>
+                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter italic mb-4 md:mb-6">Protocol <span className="text-red-500">Restricted</span></h2>
+                <p className="text-sm md:text-xl font-medium text-foreground/60 leading-relaxed">
+                  {restrictions.lockMessage || "Your operational node has been restricted by the supervisor."}
+                </p>
+                <div className="pt-8 md:pt-12 flex flex-col items-center gap-4 md:gap-6">
+                   <div className="px-4 py-1.5 md:px-6 md:py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[8px] md:text-[10px] font-black uppercase tracking-widest">
+                      Security Level: Alpha-Black
+                   </div>
+                   <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-white/20">Contact Supervisor for Neural Key</p>
+                </div>
               </div>
-            )}
+           </div>
+        </div>
+      )}
+
+      {/* Dynamic Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-glass-border pb-6 md:pb-8">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-[10px] font-black tracking-[0.3em] text-primary/60 uppercase">
+             <Radio size={12} className="animate-pulse" />
+             Neural Link Active • Node {state.currentUser?.id.substring(0, 8) || 'Alpha-01'}
+          </div>
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-tight">System Overview</h1>
+          <div className="flex flex-wrap gap-4 items-center">
+            <p className="text-xs md:text-sm text-foreground/40 font-semibold tracking-wide">Synthesizing real-time diagnostics of your academic OS.</p>
             <button 
               onClick={() => {
                 if (confirm("CRITICAL: This will wipe all neural logs and task history. Proceed?")) {
                   dispatch.resetData();
                 }
               }}
-              className="px-3 py-1 border border-red-500/20 bg-red-500/5 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-red-500/10 transition-all opacity-40 hover:opacity-100"
+              className="px-2 py-1 md:px-3 md:py-1 border border-red-500/20 bg-red-500/5 text-red-500 text-[8px] md:text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-red-500/10 transition-all opacity-40 hover:opacity-100"
             >
               Master Reset
             </button>
           </div>
         </div>
         
-        <div className="flex items-center gap-6">
-          <div className="px-6 py-3 bg-foreground/5 border border-glass-border rounded-2xl flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm font-black uppercase tracking-widest text-foreground/40 mb-1 leading-none">Intelligence Index</p>
-              <p className="text-xl font-black text-primary leading-none">{100 + (skillsCount * 2) + Math.floor(focusMinutes / 60)} <span className="text-xs text-foreground/40 italic">iQ</span></p>
+        <div className="flex flex-wrap items-center gap-3 md:gap-6 w-full md:w-auto">
+          <div className="px-4 py-2 md:px-6 md:py-3 bg-foreground/5 border border-glass-border rounded-2xl flex items-center gap-3 md:gap-4 shrink-0 flex-1 sm:flex-none">
+            <div className="text-right w-full sm:w-auto">
+              <p className="text-[8px] md:text-sm font-black uppercase tracking-widest text-foreground/40 mb-1 leading-none">Intelligence Index</p>
+              <p className="text-lg md:text-xl font-black text-primary leading-none">{100 + (skillsCount * 2) + Math.floor(focusMinutes / 60)} <span className="text-[10px] md:text-xs text-foreground/40 italic">iQ</span></p>
             </div>
           </div>
-          <div className="px-6 py-3 bg-green-500/5 border border-green-500/20 rounded-2xl flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm font-black uppercase tracking-widest text-green-500/40 mb-1 leading-none">Core Stability</p>
-              <p className="text-xl font-black text-green-500 leading-none">{totalTasks > 0 ? Math.round((tasksDone / totalTasks) * 100) : 0}%</p>
+          
+          <div className="px-4 py-2 md:px-6 md:py-3 bg-foreground/5 border border-glass-border rounded-2xl flex items-center gap-3 md:gap-4 shrink-0 flex-1 sm:flex-none">
+            <div className="text-right w-full sm:w-auto">
+              <p className="text-[8px] md:text-sm font-black uppercase tracking-widest text-foreground/40 mb-1 leading-none">Core Stability</p>
+              <p className="text-lg md:text-xl font-black text-green-500 leading-none">{productiveScore}%</p>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Redesigned Neural Link Info Card - Now in its own row */}
+      {state.currentUser?.studentCode && (
+        <div className="glass-card p-0 border-2 border-primary/30 bg-primary/5 flex flex-col md:flex-row items-stretch group relative overflow-hidden animate-in zoom-in duration-700 w-full shadow-[0_0_50px_rgba(99,102,241,0.05)]">
+           <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+           
+           {/* Left: Code Display */}
+           <div className="p-6 md:p-10 flex items-center gap-6 relative z-10 bg-white/5 border-b md:border-b-0 md:border-r border-white/5">
+              <div className="w-14 h-14 md:w-20 md:h-20 bg-primary/20 rounded-2xl flex items-center justify-center text-primary border border-primary/30 shadow-[0_0_30px_rgba(99,102,241,0.2)] group-hover:scale-110 transition-transform duration-500">
+                 <Key size={28} className="md:size-[36px]" />
+              </div>
+              <div>
+                 <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 mb-2">Neural Access Key</p>
+                 <h4 className="text-2xl md:text-5xl font-black tracking-widest text-foreground select-all uppercase">
+                   {state.currentUser.studentCode}
+                 </h4>
+              </div>
+           </div>
+
+           {/* Right: Instructions & Copy Action */}
+           <div className="p-6 md:p-10 flex items-center justify-between md:justify-end gap-6 md:gap-12 relative z-10 flex-1">
+              <div className="text-left md:text-right">
+                 <p className="text-xs md:text-sm font-bold text-foreground/40 uppercase tracking-widest leading-relaxed">
+                   Provide this unique neural signature to your <br className="hidden md:block" /> 
+                   supervisor for real-time synchronization.
+                 </p>
+              </div>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(state.currentUser?.studentCode || '');
+                  alert('NEURAL KEY COPIED');
+                }}
+                className="w-14 h-14 md:w-20 md:h-20 bg-primary text-white rounded-2xl flex items-center justify-center hover:shadow-[0_0_40px_rgba(99,102,241,0.5)] hover:scale-105 transition-all active:scale-95 group/copy relative overflow-hidden shrink-0"
+              >
+                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/copy:translate-y-0 transition-transform duration-300" />
+                 <Layers size={24} className="md:size-[30px] relative z-10 group-hover/copy:rotate-12 transition-transform" />
+              </button>
+           </div>
+        </div>
+      )}
+
       {/* Primary Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <StatCard title="Productive Score" value={productiveScore} subtitle="/ 100" icon={TrendingUp} color="primary" trend={productiveScore > 0 ? 5 : 0} />
         <StatCard title="Focus Score" value={focusMinutes} subtitle="min" icon={Zap} color="secondary" trend={focusMinutes > 0 ? 2 : 0} />
         <StatCard title="Tasks Complete" value={`${tasksDone}/${totalTasks}`} subtitle="total" icon={Target} color="primary" />
@@ -197,7 +274,7 @@ const Overview = () => {
           <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
              <Target size={16} /> Active Neural Objectives
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {milestones.map(m => (
               <div key={m._id} className={`glass-card p-6 border-2 relative overflow-hidden group ${m.status === 'completed' ? 'border-green-500/20 bg-green-500/5' : 'border-primary/20 bg-primary/5'}`}>
                 <div className="absolute -right-4 -top-4 opacity-5 pointer-events-none group-hover:scale-110 transition-transform">

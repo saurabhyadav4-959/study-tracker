@@ -52,6 +52,31 @@ router.delete('/link/:studentId', auth, async (req, res) => {
   }
 });
 
+// Update restrictions for a child
+router.post('/restrictions', auth, async (req, res) => {
+  try {
+    const parentId = req.user.id;
+    const { studentId, isLocked, dailyGoalHours, lockMessage } = req.body;
+
+    const link = await db.parent_student_links.findOne({ parentId, studentId });
+    if (!link) {
+      return res.status(404).json({ message: 'LINK NOT FOUND: CANNOT UPDATE RESTRICTIONS' });
+    }
+
+    const updates = {
+      'restrictions.isLocked': isLocked !== undefined ? isLocked : link.restrictions.isLocked,
+      'restrictions.dailyGoalHours': dailyGoalHours !== undefined ? dailyGoalHours : link.restrictions.dailyGoalHours,
+      'restrictions.lockMessage': lockMessage !== undefined ? lockMessage : link.restrictions.lockMessage
+    };
+
+    const updatedLink = await db.parent_student_links.update(link._id, updates);
+
+    res.json({ message: 'RESTRICTIONS UPDATED', restrictions: updatedLink.restrictions });
+  } catch (err) {
+    res.status(500).json({ message: 'RESTRICTION UPDATE FAILED', error: err.message });
+  }
+});
+
 // Get all linked children with stats
 router.get('/children', auth, async (req, res) => {
   try {
@@ -83,6 +108,7 @@ router.get('/children', auth, async (req, res) => {
         streak: 0, 
         alerts: [],
         latestSubject: logs.length > 0 ? logs[0].description.split(':')[0] : 'None',
+        restrictions: links.find(l => l.studentId === childId).restrictions || {}
       });
     }
 

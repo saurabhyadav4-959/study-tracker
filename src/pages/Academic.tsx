@@ -68,21 +68,21 @@ const TrackCore = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       {/* Dynamic Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-glass-border pb-8">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-black tracking-[0.3em] text-primary/60 uppercase">
+          <div className="flex items-center gap-2 text-[10px] font-black tracking-[0.3em] text-primary/60 uppercase">
             <Activity size={12} className="animate-pulse" />
             Curriculum synchronization active
           </div>
-          <h1 className="text-5xl font-black tracking-tighter uppercase leading-tight">Track Core</h1>
-          <p className="text-foreground/40 font-semibold tracking-wide">Manage your curriculum, tasks, and activity density with precision.</p>
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-tight">Track Core</h1>
+          <p className="text-xs md:text-sm text-foreground/40 font-semibold tracking-wide">Manage your curriculum, tasks, and activity density with precision.</p>
         </div>
         <button 
           onClick={() => setShowForm(!showForm)}
-          className="px-8 py-4 bg-primary text-white font-black uppercase tracking-[0.2em] text-xs rounded-2xl shadow-[0_0_30px_rgba(99,102,241,0.3)] hover:shadow-[0_0_50px_rgba(99,102,241,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 border border-primary/20"
+          className="px-6 md:px-8 py-4 bg-primary text-white font-black uppercase tracking-[0.2em] text-xs rounded-2xl shadow-[0_0_30px_rgba(99,102,241,0.3)] hover:shadow-[0_0_50px_rgba(99,102,241,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 border border-primary/20 w-full md:w-auto"
         >
           <Plus size={18} />
-          <span>{showForm ? 'Cancel Initialization' : 'Initialize Protocol'}</span>
+          <span>{showForm ? 'Cancel Sync' : 'Initialize Protocol'}</span>
         </button>
       </div>
 
@@ -156,30 +156,30 @@ const TrackCore = () => {
             
             <div className="space-y-4 relative z-10">
               {state.tasks.map((task) => (
-                <div key={task.id} className="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 bg-white/[0.02] border border-glass-border rounded-2xl hover:bg-primary/[0.03] hover:border-primary/30 transition-all duration-500 gap-6">
-                  <div className="flex items-center gap-6">
+                <div key={task.id} className="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 md:p-6 bg-white/[0.02] border border-glass-border rounded-2xl hover:bg-primary/[0.03] hover:border-primary/30 transition-all duration-500 gap-4 md:gap-6">
+                  <div className="flex items-center gap-4 md:gap-6 w-full sm:w-auto">
                     <div className={`w-3 h-3 rounded-full shrink-0 ${task.priority === 'High' ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]' : task.priority === 'Medium' ? 'bg-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'bg-blue-500'}`} />
-                    <div>
-                      <h4 className="font-black text-lg tracking-tight uppercase group-hover:text-primary transition-colors text-foreground">{task.title}</h4>
-                      <p className="text-sm text-foreground/50 uppercase tracking-[0.2em] font-black mt-1">{task.track} • Timeline Node: {task.deadline}</p>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-black text-base md:text-lg tracking-tight uppercase group-hover:text-primary transition-colors text-foreground truncate">{task.title}</h4>
+                      <p className="text-[10px] md:text-sm text-foreground/50 uppercase tracking-[0.2em] font-black mt-1 truncate">{task.track} • {task.deadline}</p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between w-full sm:w-auto gap-6 sm:border-l sm:border-white/5 sm:pl-6">
-                    <div className={`px-3 py-1 rounded-[4px] border border-white/5 text-[10px] font-black uppercase tracking-widest ${task.status === 'Done' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-white/5 text-foreground/40'}`}>
+                  <div className="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-6 sm:border-l sm:border-white/5 sm:pl-6 pt-4 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                    <div className={`px-2.5 py-1 rounded-[4px] border border-white/5 text-[9px] md:text-[10px] font-black uppercase tracking-widest ${task.status === 'Done' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-white/5 text-foreground/40'}`}>
                       {task.status}
                     </div>
                     <div className="flex items-center gap-2">
                        <button 
                         onClick={() => dispatch.toggleTaskStatus(task.id)}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${task.status === 'Done' ? 'bg-green-500/10 text-green-500' : 'bg-white/5 text-foreground/40 hover:text-white hover:bg-white/10'}`}
+                        className={`w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center transition-all ${task.status === 'Done' ? 'bg-green-500/10 text-green-500' : 'bg-white/5 text-foreground/40 hover:text-white hover:bg-white/10'}`}
                       >
-                        <CheckCircle2 size={18} />
+                        <CheckCircle2 size={16} className="md:size-[18px]" />
                       </button>
                       <button 
                         onClick={() => dispatch.removeTask(task.id)}
-                        className="w-10 h-10 rounded-xl bg-white/5 text-foreground/50 hover:text-red-400 hover:bg-red-400/10 transition-all flex items-center justify-center"
+                        className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white/5 text-foreground/50 hover:text-red-400 hover:bg-red-400/10 transition-all flex items-center justify-center"
                       >
-                        <MoreVertical size={18} />
+                        <MoreVertical size={16} className="md:size-[18px]" />
                       </button>
                     </div>
                   </div>

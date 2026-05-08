@@ -1,36 +1,35 @@
 # Production Hosting Guide
 
-Since the frontend is on GitHub Pages (static), you must host the backend (the `server/` folder) on a platform that supports Node.js.
+The application is structured as a Vite frontend and a Node.js backend.
 
-## Recommended: Render.com (Free Tier)
+## 1. Backend Hosting (Render.com)
 
-1.  **Create a New Web Service**: Link your GitHub repository.
-2.  **Root Directory**: Set this to `.` (or keep it default if you link the whole repo).
+1.  **Web Service Setup**: Link your repo.
+2.  **Root Directory**: Set to `server` (if deploying just the backend) or `.` (if using the root `npm start`).
 3.  **Build Command**: `npm install`
-4.  **Start Command**: `node server/server.js` (Make sure the path is correct).
-5.  **Environment Variables**:
-    *   `JWT_SECRET`: (Pick a strong random string)
-    *   `PORT`: `10000` (Render's default)
-6.  **CORS Setup**: Ensure the server allows requests from your GitHub Pages URL.
+4.  **Start Command**: `node server.js` (if Root Directory is `server`) or `node server/server.js` (if Root Directory is `.`).
+5.  **Environment Variables (CRITICAL)**:
+    *   `MONGODB_URI`: `mongodb+srv://saurabhy4959:Rajesh%40241006@cluster0...`
+        > [!IMPORTANT]
+        > **Note the `%40`** instead of `@` in the password. Without this, Render will fail to connect.
+    *   `JWT_SECRET`: `neural_secret_key_2026` (or your preferred secret)
+    *   `PORT`: `5000` (or leave empty, Render assigns one)
 
-## Updating the Frontend
+## 2. Frontend Hosting (GitHub Pages / Vercel)
 
-Once your backend is live (e.g., `https://study-tracker-api.onrender.com`), you need to update the frontend to point to it.
+The frontend is already configured to use the correct API URL in `src/config.ts`.
 
-1.  In `vite.config.ts`, update the proxy (for local dev).
-2.  In your frontend fetch calls (e.g., `src/pages/Login.tsx`), ensure you are using the full URL or an environment variable.
+1.  **Check `src/config.ts`**:
+    ```typescript
+    export const API_BASE_URL = import.meta.env.PROD 
+      ? 'https://study-tracker-56a2.onrender.com' 
+      : 'http://localhost:5000';
+    ```
+2.  **Verify Production URL**: Ensure the Render URL above matches your actual live service URL.
 
-> [!IMPORTANT]
-> The current frontend code uses relative paths like `/api/auth/login`. On GitHub Pages, this points to GitHub's servers, which causes the **405 Method Not Allowed** error.
-> You must either:
-> 1.  Use an absolute URL in your fetch calls (e.g., `https://your-api.com/api/auth/login`).
-> 2.  Set up a proxy or use a global config for the API Base URL.
+## 3. Database Security (MongoDB Atlas)
 
-## Example API Base URL Config
-
-```typescript
-// src/config.ts
-export const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://your-api.onrender.com' 
-  : '';
-```
+> [!CAUTION]
+> **IP Access**: In MongoDB Atlas, go to **Network Access** and ensure that you have whitelisted either:
+> 1.  `0.0.0.0/0` (Allow access from anywhere - recommended for Render as their IPs change).
+> 2.  The specific Outbound IPs provided by your hosting platform.

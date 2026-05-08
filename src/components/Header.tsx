@@ -23,7 +23,7 @@ const Header = () => {
   };
 
   return (
-    <header className="h-24 fixed top-0 right-0 left-0 lg:left-72 bg-background/40 backdrop-blur-2xl border-b border-glass-border flex items-center justify-between px-6 md:px-10 z-40">
+    <header className="h-20 md:h-24 fixed top-0 right-0 left-0 lg:left-72 bg-background/40 backdrop-blur-2xl border-b border-glass-border flex items-center justify-between px-4 md:px-10 z-40">
       <div className="flex items-center gap-4">
         <button 
           onClick={() => dispatch.toggleSidebar()}
@@ -32,13 +32,13 @@ const Header = () => {
           <Menu size={24} />
         </button>
         <div className="flex flex-col">
-          <div className="flex items-center gap-2 mb-1">
-             <span className="text-[10px] md:text-sm font-black tracking-[0.4em] text-primary/40 uppercase">Operational Node /</span>
-             <span className="text-[10px] md:text-sm font-black tracking-[0.4em] text-primary uppercase">{getPageTitle()}</span>
+          <div className="flex items-center gap-1 mb-0.5">
+             <span className="text-[8px] md:text-sm font-black tracking-[0.2em] md:tracking-[0.4em] text-primary/40 uppercase whitespace-nowrap">Node /</span>
+             <span className="text-[8px] md:text-sm font-black tracking-[0.2em] md:tracking-[0.4em] text-primary uppercase whitespace-nowrap">{getPageTitle()}</span>
           </div>
-          <h2 className="text-lg md:text-xl font-black tracking-tight flex items-center gap-3">
-            <span className="text-foreground/50 font-bold italic hidden sm:inline">User:</span> 
-            <span className="uppercase tracking-tighter italic">{state.profile.name}</span>
+          <h2 className="text-sm md:text-xl font-black tracking-tight flex items-center gap-2 md:gap-3">
+            <span className="text-foreground/50 font-bold italic hidden lg:inline">User:</span> 
+            <span className="uppercase tracking-tighter italic truncate max-w-[80px] md:max-w-none">{state.profile.name}</span>
             {state.currentUser?.studentCode && (
               <span className="text-[10px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-lg ml-2 hidden sm:inline">
                 ID: {state.currentUser.studentCode}
@@ -48,7 +48,7 @@ const Header = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-10">
+      <div className="flex items-center gap-4 md:gap-10">
         <div className="relative group hidden lg:block">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40 group-focus-within:text-primary transition-all duration-500" size={16} />
           <input 
@@ -58,13 +58,13 @@ const Header = () => {
           />
         </div>
 
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 md:gap-8">
            <button className="relative text-foreground/40 hover:text-primary transition-colors group">
               <Bell size={20} className="group-hover:rotate-12 transition-transform" />
               <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(99,102,241,0.8)] animate-pulse" />
            </button>
 
-          <NavLink to="/profile" className="flex items-center gap-5 border-l-2 border-glass-border pl-8 hover:opacity-80 transition-all duration-500 group shrink-0">
+          <NavLink to="/profile" className="flex items-center gap-3 md:gap-5 border-l-2 border-glass-border pl-4 md:pl-8 hover:opacity-80 transition-all duration-500 group shrink-0">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-black tracking-tight text-foreground uppercase group-hover:text-primary transition-colors">{state.profile.name}</p>
               <div className="flex items-center gap-2 justify-end mt-1.5">

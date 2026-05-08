@@ -20,16 +20,23 @@ mongoose.connect(MONGODB_URI)
   .then(() => console.log('SYSTEM HUB: CONNECTED TO NEURAL DATABASE (MONGODB ATLAS)'))
   .catch(err => console.error('SYSTEM HUB: DATABASE CONNECTION PROTOCOL FAILED', err));
 
+const checkConnection = () => {
+  if (mongoose.connection.readyState !== 1) {
+    throw new Error('DATABASE_NOT_CONNECTED: Please ensure MongoDB is reachable and IP is whitelisted.');
+  }
+};
+
 const db = {
   users: {
-    find: async (query = {}) => await User.find(query),
-    findOne: async (query = {}) => await User.findOne(query),
-    findById: async (id) => await User.findById(id),
+    find: async (query = {}) => { checkConnection(); return await User.find(query); },
+    findOne: async (query = {}) => { checkConnection(); return await User.findOne(query); },
+    findById: async (id) => { checkConnection(); return await User.findById(id); },
     insert: async (user) => {
+      checkConnection();
       const newUser = new User(user);
       return await newUser.save();
     },
-    update: async (id, updates) => await User.findByIdAndUpdate(id, updates, { new: true })
+    update: async (id, updates) => { checkConnection(); return await User.findByIdAndUpdate(id, updates, { new: true }); }
   },
   logs: {
     find: async (query = {}) => {
@@ -78,10 +85,12 @@ const db = {
   },
   parent_student_links: {
     find: async (query = {}) => await ParentStudentLink.find(query),
+    findOne: async (query = {}) => await ParentStudentLink.findOne(query),
     insert: async (link) => {
       const newLink = new ParentStudentLink(link);
       return await newLink.save();
-    }
+    },
+    update: async (id, updates) => await ParentStudentLink.findByIdAndUpdate(id, updates, { new: true })
   }
 };
 
