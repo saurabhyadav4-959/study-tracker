@@ -189,7 +189,11 @@ const ParentDashboard = () => {
       setStudentCode('');
       fetchChildren();
     } catch (err: any) {
-      setError(err.message.toUpperCase());
+      let msg = err.message.toUpperCase();
+      if (msg.includes('TOKEN')) {
+        msg = "⚠️ SESSION EXPIRED: PLEASE 'TERMINATE SYNC' (LOGOUT) AND LOGIN AGAIN TO FIX THIS.";
+      }
+      setError(msg);
     }
   };
 
