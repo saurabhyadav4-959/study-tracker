@@ -9,37 +9,10 @@ import EmptyChart from '../components/EmptyChart';
 
 const formatChartData = (logs: any[], timeframe: string) => {
   if (!logs || logs.length === 0) return [];
-  if (timeframe === 'W') {
-    const today = new Date();
-    const day = today.getDay(); 
-    const diff = today.getDate() - day + (day === 0 ? -6 : 1); 
-    const monday = new Date(today.setDate(diff));
-    monday.setHours(0,0,0,0);
-    
-    const weekLogs = logs.filter(l => new Date(l.date) >= monday);
-    const result = [];
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(monday);
-      d.setDate(d.getDate() + i);
-      const ds = d.toLocaleDateString('en-CA');
-      const found = weekLogs.find(l => l.date === ds);
-      result.push({
-        name: d.toLocaleDateString('en-US', { weekday: 'short' }),
-        productive: found?.count || 0,
-        focus: (found?.intensity || 0) * 10
-      });
-    }
-    return result;
-  }
-  if (timeframe === 'M') {
-    return logs.slice(-30).map(log => ({
-      name: new Date(log.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
-      productive: log.count || 0,
-      focus: (log.intensity || 0) * 10
-    }));
-  }
-  return logs.slice(-7).map(log => ({
-    name: new Date(log.date).toLocaleDateString('en-US', { weekday: 'short' }),
+  
+  // Just show the most recent logs for now to verify data flow
+  return logs.slice(-30).map(log => ({
+    name: new Date(log.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
     productive: log.count || 0,
     focus: (log.intensity || 0) * 10
   }));

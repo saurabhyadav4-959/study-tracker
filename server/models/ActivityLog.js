@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const activityLogSchema = new mongoose.Schema({
-  _id: { type: String },
+  _id: { 
+    type: String, 
+    default: () => 'log_' + Math.random().toString(36).substr(2, 9) 
+  },
   userId: { type: String, required: true },
   studentId: { type: String }, // Reference to student for parent view
   role: { type: String, required: true },

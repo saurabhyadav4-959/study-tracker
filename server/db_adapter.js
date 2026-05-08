@@ -54,6 +54,7 @@ const db = {
     },
     insert: async (log) => {
       const newLog = new ActivityLog(log);
+      if (!newLog._id) newLog._id = 'log_' + Math.random().toString(36).substr(2, 9);
       return await newLog.save();
     }
   },
