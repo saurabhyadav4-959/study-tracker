@@ -248,29 +248,41 @@ const ParentStudentMirror = () => {
 // Extracted exact visuals from Dashboard Layout
 const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, timeframe: string, setTimeframe: any }) => {
   const getActiveData = () => {
-    // Generate mock activity logs if none exist but tasks are done, because parent data payload only sends actionLogs, not "activityLogs" yet. 
-    // We map ActionLogs to ActivityLogs chart format
-    const mockLogs = data.logs.map((log: any) => ({
-      date: new Date(log.timestamp).toLocaleDateString('en-CA'),
-      productive: 1,
-      name: new Date(log.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    }));
-    return formatChartData(mockLogs, timeframe);
+    // We map backend logs to chart format
+    const dailyData: any = {};
+    data.logs.forEach((log: any) => {
+      const d = new Date(log.timestamp).toLocaleDateString('en-CA');
+      if (!dailyData[d]) dailyData[d] = { count: 0, intensity: 0 };
+      dailyData[d].count += 1;
+      dailyData[d].intensity += 1;
+    });
+
+    const result = [];
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(today.getDate() - i);
+      const ds = d.toLocaleDateString('en-CA');
+      const dayData = dailyData[ds] || { count: 0, intensity: 0 };
+      
+      result.push({
+        name: d.toLocaleDateString('en-US', { weekday: 'short' }),
+        productive: dayData.count,
+        focus: dayData.intensity * 10
+      });
+    }
+    return result;
   };
 
   const tasksDone = data.tasks.filter((t: any) => t.status === 'Done').length;
   const totalTasks = data.tasks.length;
   const skillsCount = data.skills.length;
-  
-  // Calculate scores
   const productiveScore = totalTasks > 0 ? Math.round((tasksDone / totalTasks) * 100) : 0;
-  const focusMinutes = 0; // Pomodoro isn't saved in deepData yet in parent.js, fallback to 0 or mock
-  const focusScore = Math.min(100, Math.round((focusMinutes / 300) * 100)); 
   const hasActivity = data.logs && data.logs.length > 0;
 
   return (
     <div className="space-y-12">
-      {/* Primary Metrics Grid */}
+      {/* 1. Stat Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard title="Productive Score" value={productiveScore} subtitle="/ 100" icon={TrendingUp} color="primary" trend={productiveScore > 0 ? 5 : 0} />
         <StatCard title="Total XP Points" value={data.profile.xp || 0} subtitle="pts" icon={Zap} color="secondary" />
@@ -278,9 +290,11 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
         <StatCard title="Skills Mastered" value={skillsCount} subtitle="nodes" icon={Layers} color="green-400" trend={skillsCount > 0 ? 1 : 0} />
       </div>
 
+      {/* 2. Main Analytics Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Performance Hub */}
-        <div className="lg:col-span-2 space-y-8">
+        {/* Left: Chart and Detailed Logs */}
+        <div className="lg:col-span-2 space-y-12">
+          {/* Chart Card */}
           <div className="glass-card p-10 border-2 border-glass-border relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent pointer-events-none" />
             <div className="flex justify-between items-center mb-12 relative z-10">
@@ -327,7 +341,6 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
             </div>
           </div>
 
-        <div className="lg:col-span-2 space-y-12">
           {/* Detailed Neural Activity Log */}
           <div className="glass-card p-8 border-2 border-glass-border relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent pointer-events-none" />
@@ -393,18 +406,18 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
           </div>
         </div>
 
-        {/* Biological Sync */}
-        <div className="lg:col-span-1 border-2 border-glass-border glass-card p-10 h-full relative overflow-hidden flex flex-col group">
+        {/* Right: Core Execution (Circular Progress) */}
+        <div className="lg:col-span-1 border-2 border-glass-border glass-card p-10 h-fit relative overflow-hidden flex flex-col group">
              <div className="absolute -top-12 -right-12 text-primary opacity-5 group-hover:opacity-10 transition-all duration-700">
               <Flame size={240} />
             </div>
             
-            <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-12 flex items-center gap-3">
+            <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-12 flex items-center gap-3 relative z-10">
               <Flame size={16} />
-              Core Execution Status
+              Core Execution
             </h3>
             
-            <div className="flex-1 flex flex-col justify-center items-center relative z-10 w-full mt-4">
+            <div className="flex flex-col justify-center items-center relative z-10 w-full mb-10">
               <div className="relative w-56 h-56">
                 <svg className="w-full h-full -rotate-90 scale-110">
                   <circle cx="112" cy="112" r="90" fill="transparent" stroke="currentColor" strokeWidth="2" className="text-white/5" />
@@ -421,24 +434,20 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
               </div>
             </div>
             
-            <div className="mt-auto pt-10 border-t border-glass-border relative z-10 mt-12 w-full">
+            <div className="pt-10 border-t border-glass-border relative z-10 w-full">
               <h4 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">Node Objectives</h4>
-              <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+              <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2">
                 {data.tasks.length === 0 ? (
-                  <p className="text-[9px] font-black uppercase text-foreground/20 italic">No tasks assigned.</p>
+                  <p className="text-[9px] font-black uppercase text-foreground/20 italic text-center py-4">No objectives assigned.</p>
                 ) : (
                   data.tasks.map((t: any, i: number) => (
-                    <div key={i} className="flex items-center justify-between p-2 bg-foreground/5 rounded-lg border border-glass-border">
-                      <span className={`text-[9px] font-black uppercase truncate ${t.status === 'Done' ? 'line-through text-foreground/20' : 'text-foreground/70'}`}>{t.title}</span>
-                      <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${t.status === 'Done' ? 'bg-green-500/20 text-green-500' : 'bg-primary/20 text-primary'}`}>{t.status}</span>
+                    <div key={i} className="flex items-center justify-between p-3 bg-foreground/5 rounded-xl border border-glass-border hover:bg-primary/5 transition-all">
+                      <span className={`text-[10px] font-bold uppercase truncate ${t.status === 'Done' ? 'line-through text-foreground/20' : 'text-foreground/70'}`}>{t.title}</span>
+                      <span className={`text-[8px] font-black uppercase px-2 py-1 rounded-md ${t.status === 'Done' ? 'bg-green-500/20 text-green-500' : 'bg-primary/20 text-primary'}`}>{t.status}</span>
                     </div>
                   ))
                 )}
               </div>
-            </div>
-            
-            <div className="mt-8 pt-4 border-t border-glass-border text-center">
-              <span className="text-xs uppercase tracking-widest font-black text-foreground/40">Read Only Mirror</span>
             </div>
         </div>
       </div>
