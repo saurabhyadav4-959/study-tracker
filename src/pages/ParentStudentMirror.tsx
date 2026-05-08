@@ -375,7 +375,23 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
               </div>
             </div>
             
-            <div className="mt-auto pt-10 border-t border-glass-border relative z-10 mt-12 w-full text-center hover:bg-white/5 transition-colors p-4 rounded-xl cursor-not-allowed">
+            <div className="mt-auto pt-10 border-t border-glass-border relative z-10 mt-12 w-full">
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">Node Objectives</h4>
+              <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+                {data.tasks.length === 0 ? (
+                  <p className="text-[9px] font-black uppercase text-foreground/20 italic">No tasks assigned.</p>
+                ) : (
+                  data.tasks.map((t: any, i: number) => (
+                    <div key={i} className="flex items-center justify-between p-2 bg-foreground/5 rounded-lg border border-glass-border">
+                      <span className={`text-[9px] font-black uppercase truncate ${t.status === 'Done' ? 'line-through text-foreground/20' : 'text-foreground/70'}`}>{t.title}</span>
+                      <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${t.status === 'Done' ? 'bg-green-500/20 text-green-500' : 'bg-primary/20 text-primary'}`}>{t.status}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            
+            <div className="mt-8 pt-4 border-t border-glass-border text-center">
               <span className="text-xs uppercase tracking-widest font-black text-foreground/40">Read Only Mirror</span>
             </div>
         </div>
