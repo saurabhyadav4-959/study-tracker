@@ -21,11 +21,11 @@ const ConsistencyHub = () => {
 
   // Helper to get color based on intensity
   const getHeatColor = (intensity: number) => {
-    if (intensity === 0) return 'bg-white/5';
-    if (intensity === 1) return 'bg-blue-900/40'; 
-    if (intensity === 2) return 'bg-blue-700/60';
-    if (intensity === 3) return 'bg-blue-500/80';
-    return 'bg-blue-400 shadow-[0_0_15px_rgba(96,165,250,0.4)]'; 
+    if (intensity === 0) return 'bg-foreground/[0.05] dark:bg-white/5';
+    if (intensity === 1) return 'bg-primary/20 dark:bg-blue-900/40'; 
+    if (intensity === 2) return 'bg-primary/40 dark:bg-blue-700/60';
+    if (intensity === 3) return 'bg-primary/70 dark:bg-blue-500/80';
+    return 'bg-primary shadow-[0_0_15px_rgba(99,102,241,0.4)] dark:bg-blue-400'; 
   };
 
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -123,11 +123,11 @@ const ConsistencyHub = () => {
             <span>Historical View</span>
             <div className="flex items-center gap-1">
               <span>Less</span>
-              <div className="w-2.5 h-2.5 rounded-[1px] bg-white/5" />
-              <div className="w-2.5 h-2.5 rounded-[1px] bg-blue-900/40" />
-              <div className="w-2.5 h-2.5 rounded-[1px] bg-blue-700/60" />
-              <div className="w-2.5 h-2.5 rounded-[1px] bg-blue-500/80" />
-              <div className="w-2.5 h-2.5 rounded-[1px] bg-blue-400" />
+              <div className="w-2.5 h-2.5 rounded-[1px] bg-foreground/[0.05] dark:bg-white/5" />
+              <div className="w-2.5 h-2.5 rounded-[1px] bg-primary/20 dark:bg-blue-900/40" />
+              <div className="w-2.5 h-2.5 rounded-[1px] bg-primary/40 dark:bg-blue-700/60" />
+              <div className="w-2.5 h-2.5 rounded-[1px] bg-primary/70 dark:bg-blue-500/80" />
+              <div className="w-2.5 h-2.5 rounded-[1px] bg-primary dark:bg-blue-400" />
               <span>More</span>
             </div>
           </div>

@@ -8,6 +8,7 @@ import { ActionLog } from '../types';
 
 const SupervisorFeed = () => {
   const [logs, setLogs] = useState<any[]>([]);
+  const [children, setChildren] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const [selectedStudent, setSelectedStudent] = useState('');
@@ -15,6 +16,37 @@ const SupervisorFeed = () => {
   const [dropPos, setDropPos] = useState({ top: 0, left: 0, width: 0 });
   const dropRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
+
+  const fetchData = async () => {
+    const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+    try {
+      // Fetch Children for Filter
+      const childRes = await fetch(`${API_BASE_URL}/api/parent/children`, {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      const childData = await childRes.json();
+      if (Array.isArray(childData)) setChildren(childData);
+
+      // Fetch Feed Logs
+      const feedRes = await fetch(`${API_BASE_URL}/api/parent/activity-feed`, {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      const feedData = await feedRes.json();
+      if (Array.isArray(feedData)) {
+        setLogs(feedData);
+      } else {
+        setLogs([]);
+      }
+    } catch (err) {
+      console.error('Data fetch failed', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -36,30 +68,7 @@ const SupervisorFeed = () => {
     setDropOpen(p => !p);
   };
 
-  const fetchFeed = async () => {
-    const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/parent/activity-feed`, {
-        headers: { 'Authorization': `Bearer ${user.token}` }
-      });
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setLogs(data);
-      } else {
-        setLogs([]);
-      }
-    } catch (err) {
-      console.error('Feed fetch failed', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchFeed();
-  }, []);
-
-  const uniqueStudents = Array.from(new Set(logs.map(log => log.childName)));
+  const studentNames = Array.from(new Set(children.map(c => c.name)));
 
   const filteredLogs = logs.filter(log => {
     const matchesText = (log.childName || '').toLowerCase().includes(filter.toLowerCase()) ||
@@ -111,7 +120,7 @@ const SupervisorFeed = () => {
               style={{ position: 'fixed', top: dropPos.top, left: dropPos.left, width: dropPos.width, zIndex: 9999 }}
               className="bg-background border border-glass-border rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
             >
-              {(['', ...uniqueStudents] as string[]).map((name, i) => (
+              {(['', ...studentNames] as string[]).map((name, i) => (
                 <button
                   key={i}
                   onClick={() => { setSelectedStudent(name); setDropOpen(false); }}
