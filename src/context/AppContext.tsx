@@ -219,14 +219,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const toggleTaskStatus = (id: string) => {
-    setState(prev => {
-      const task = prev.tasks.find(t => t.id === id);
-      const isFinishing = task && task.status !== 'Done';
-      
-      if (isFinishing) {
-        logActivity('COMPLETE_TASK', `Objective Achieved: ${task.title}`);
-      }
+    const task = state.tasks.find(t => t.id === id);
+    const isFinishing = task && task.status !== 'Done';
+    if (isFinishing) {
+      logActivity('COMPLETE_TASK', `Objective Achieved: ${task.title}`);
+    }
 
+    setState(prev => {
       const newState: AppState = {
         ...prev,
         tasks: prev.tasks.map(t => t.id === id ? { ...t, status: (t.status === 'Done' ? 'Todo' : 'Done') as TaskStatus } : t)
