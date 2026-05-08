@@ -6,6 +6,7 @@ const auth = require('../middleware/auth');
 // Post a new activity log
 router.post('/', auth, async (req, res) => {
   try {
+    console.log(`[LOG_SYNC] Incoming from ${req.user.id}:`, req.body);
     const { actionType, description, timeSpent, studentId } = req.body;
     const log = await db.logs.insert({
       userId: req.user.id,

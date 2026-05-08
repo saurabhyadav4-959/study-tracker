@@ -164,6 +164,15 @@ const BandwidthAllocation = () => {
             )}
             <div className="absolute -top-12 -right-12 text-foreground/5 transition-transform group-hover:scale-110 duration-1000 rotate-12">
               <Timer size={180} />
+              <button 
+                onClick={() => {
+                  logActivity('TEST_SIGNAL', 'Manual Neural Link Verification Successful');
+                  alert('SIGNAL SENT: CHECK PARENT DASHBOARD');
+                }}
+                className="px-6 py-2 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:bg-primary/20 transition-all mt-4"
+              >
+                Test Neural Link
+              </button>
             </div>
           </div>
 
