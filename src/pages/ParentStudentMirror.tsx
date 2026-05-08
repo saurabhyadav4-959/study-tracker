@@ -14,16 +14,22 @@ const formatChartData = (logs: any[], timeframe: string) => {
   const dailyData: { [key: string]: { count: number, intensity: number } } = {};
   
   logs.forEach(log => {
-    const date = new Date(log.timestamp).toLocaleDateString('en-CA');
-    if (!dailyData[date]) {
-      dailyData[date] = { count: 0, intensity: 0 };
+    try {
+      const date = new Date(log.timestamp).toLocaleDateString('en-CA');
+      console.log(`[MIRROR_DEBUG] Processing log: ${log.actionType} at ${date}`);
+      if (!dailyData[date]) {
+        dailyData[date] = { count: 0, intensity: 0 };
+      }
+      dailyData[date].count += 1;
+      dailyData[date].intensity = Math.min(4, dailyData[date].intensity + 1);
+    } catch (e) {
+      console.error('[MIRROR_DEBUG] Failed to parse log date', log);
     }
-    dailyData[date].count += 1;
-    dailyData[date].intensity = Math.min(4, dailyData[date].intensity + 1);
   });
 
   const today = new Date();
   const result = [];
+  console.log('[MIRROR_DEBUG] Grouped Daily Data:', dailyData);
   
   // Last 7 days for 'W' view
   for (let i = 6; i >= 0; i--) {
@@ -138,6 +144,7 @@ const ParentStudentMirror = () => {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const deepData = await res.json();
+      console.log('[MIRROR_DEBUG] Deep Scan Result:', deepData);
       // Ensure safe fallback structures
       if (!deepData.tasks) deepData.tasks = [];
       if (!deepData.skills) deepData.skills = [];
