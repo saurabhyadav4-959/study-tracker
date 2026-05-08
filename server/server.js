@@ -26,5 +26,15 @@ app.use('/api/logs', require('./routes/logs'));
 app.use('/api/tasks', require('./routes/tasks'));
 app.use('/api/milestones', require('./routes/milestones'));
 
+app.get('/api/health', (req, res) => {
+  const status = db.users ? 'ACTIVE' : 'DISCONNECTED';
+  const dbStatus = require('mongoose').connection.readyState === 1 ? 'CONNECTED' : 'DISCONNECTED';
+  res.json({ 
+    server: 'ONLINE', 
+    database: dbStatus,
+    timestamp: new Date().toISOString()
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`SYSTEM HUB SERVER INITIALIZED ON PORT ${PORT}`));
