@@ -103,7 +103,12 @@ const ParentStudentMirror = () => {
 
   useEffect(() => {
     fetchChildren();
-  }, []);
+    const interval = setInterval(() => {
+      fetchChildren();
+      if (selectedId) performDeepScan(selectedId);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [selectedId]);
 
   const fetchChildren = async () => {
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');

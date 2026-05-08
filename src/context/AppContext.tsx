@@ -87,16 +87,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (!user.token) return;
 
     try {
-      await fetch(`${API_BASE_URL}/api/logs`, {
+      const res = await fetch(`${API_BASE_URL}/api/logs`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
         body: JSON.stringify({ actionType, description, timeSpent })
       });
+      if (!res.ok) console.error('SYNC ERROR: FAILED TO LOG ACTIVITY', await res.text());
     } catch (err) {
-      console.error('FAILED TO LOG NEURAL ACTIVITY', err);
+      console.error('NEURAL LINK ERROR:', err);
     }
   };
 

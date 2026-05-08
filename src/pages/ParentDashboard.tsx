@@ -173,6 +173,8 @@ const ParentDashboard = () => {
 
   useEffect(() => {
     fetchChildren();
+    const interval = setInterval(fetchChildren, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleLink = async (e: React.FormEvent) => {
