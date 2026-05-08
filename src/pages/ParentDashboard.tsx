@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE_URL } from '../config';
 import { 
   Zap, Clock, Target, Shield, Users, Search, 
   Activity, AlertCircle, TrendingUp, BarChart3,
   Calendar, Flame, ChevronRight, CheckCircle2,
-  ArrowUpRight, ArrowDownRight, Layers
+  ArrowUpRight, ArrowDownRight, Layers, ChevronDown, Check
 } from 'lucide-react';
 import { 
   BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
@@ -43,6 +44,85 @@ interface ChildNode {
     lockMessage: string;
   };
 }
+
+const CustomSelect = ({ label, value, options, onChange, placeholder }: { label: string, value: string, options: { label: string, value: string }[], onChange: (val: string) => void, placeholder?: string }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const handleToggle = () => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setCoords({ 
+        top: rect.bottom + window.scrollY + 8, 
+        left: rect.left + window.scrollX, 
+        width: rect.width 
+      });
+    }
+    setIsOpen(!isOpen);
+  };
+
+  const selectedOption = options.find(o => o.value === value);
+
+  return (
+    <div className="space-y-2 relative" ref={containerRef}>
+      <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">{label}</label>
+      <div 
+        ref={triggerRef}
+        onClick={handleToggle}
+        className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase flex items-center justify-between cursor-pointer hover:border-primary/50 transition-all text-foreground"
+      >
+        <span className={!selectedOption ? 'text-foreground/40' : ''}>
+          {selectedOption ? selectedOption.label : placeholder || 'SELECT OPTION'}
+        </span>
+        <ChevronDown size={14} className={`text-primary/60 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+      </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            style={{ 
+              position: 'fixed', 
+              top: coords.top - window.scrollY, 
+              left: coords.left - window.scrollX, 
+              width: coords.width, 
+              zIndex: 9999 
+            }}
+            className="bg-[#0a0a0c] border-2 border-glass-border rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-3xl"
+          >
+            {options.map((opt) => (
+              <div 
+                key={opt.value}
+                onClick={() => {
+                  onChange(opt.value);
+                  setIsOpen(false);
+                }}
+                className={`px-4 py-3 flex items-center justify-between hover:bg-primary/10 hover:text-primary transition-all cursor-pointer text-[10px] font-black uppercase tracking-widest ${value === opt.value ? 'bg-primary/20 text-primary' : 'text-foreground/60'}`}
+              >
+                <span>{opt.label}</span>
+                {value === opt.value && <Check size={12} />}
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 const ParentDashboard = () => {
   const [children, setChildren] = useState<ChildNode[]>([]);
@@ -234,25 +314,32 @@ const ParentDashboard = () => {
            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/40 flex items-center gap-2">
              <Activity size={14} /> Active Node Matrix
            </h3>
-           <form onSubmit={handleLink} className="flex flex-col sm:flex-row gap-3 relative z-20 items-stretch w-full sm:w-auto">
-              <div className="relative flex-1 sm:min-w-[280px]">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40" size={16} />
-                <input 
-                  value={studentCode}
-                  onChange={(e) => setStudentCode(e.target.value)}
-                  placeholder="ENTER STUDENT UNIQUE ID..." 
-                  className="w-full h-12 md:h-14 bg-background border-2 border-glass-border rounded-2xl pl-12 pr-6 text-[10px] font-black uppercase tracking-widest outline-none focus:border-primary/40 focus:bg-foreground/5 transition-all cursor-text placeholder:text-foreground/20 text-foreground" 
-                />
-              </div>
-              <button 
-                type="submit"
-                disabled={!studentCode}
-                className="h-12 md:h-14 bg-primary hover:bg-primary/80 text-white px-6 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-30 disabled:pointer-events-none group shadow-[0_10px_30px_rgba(99,102,241,0.2)] hover:shadow-[0_15px_40px_rgba(99,102,241,0.4)]"
-              >
-                <Users size={18} className="group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap">Connect Node</span>
-              </button>
-           </form>
+           <div className="flex flex-col gap-2 w-full sm:w-auto">
+             <form onSubmit={handleLink} className="flex flex-col sm:flex-row gap-3 relative z-20 items-stretch w-full sm:w-auto">
+                <div className="relative flex-1 sm:min-w-[280px]">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40" size={16} />
+                  <input 
+                    value={studentCode}
+                    onChange={(e) => { setStudentCode(e.target.value); setError(''); }}
+                    placeholder="ENTER STUDENT UNIQUE ID..." 
+                    className="w-full h-12 md:h-14 bg-background border-2 border-glass-border rounded-2xl pl-12 pr-6 text-[10px] font-black uppercase tracking-widest outline-none focus:border-primary/40 focus:bg-foreground/5 transition-all cursor-text placeholder:text-foreground/20 text-foreground" 
+                  />
+                </div>
+                <button 
+                  type="submit"
+                  disabled={!studentCode}
+                  className="h-12 md:h-14 bg-primary hover:bg-primary/80 text-white px-6 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-30 disabled:pointer-events-none group shadow-[0_10px_30px_rgba(99,102,241,0.2)] hover:shadow-[0_15px_40px_rgba(99,102,241,0.4)]"
+                >
+                  <Users size={18} className="group-hover:scale-110 transition-transform" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap">Connect Node</span>
+                </button>
+             </form>
+             {error && (
+               <p className="text-[10px] font-black text-red-500 uppercase tracking-widest px-4 animate-in slide-in-from-top-1">
+                 ⚠️ {error}
+               </p>
+             )}
+           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -488,31 +575,25 @@ const ParentDashboard = () => {
                </div>
 
                <form onSubmit={handleCreateMilestone} className="space-y-6 relative z-10">
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                   <div className="space-y-2">
-                     <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Target Node</label>
-                     <select 
-                       value={milestoneForm.childId}
-                       onChange={(e) => setMilestoneForm({...milestoneForm, childId: e.target.value})}
-                       className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236366f1%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.25em] bg-[right_1rem_center] bg-no-repeat"
-                     >
-                       <option value="" className="bg-[#0a0a0c]">SELECT STUDENT</option>
-                       {children.map(c => <option key={c.id} value={c.id} className="bg-[#0a0a0c]">{c.name}</option>)}
-                     </select>
-                   </div>
-                   <div className="space-y-2">
-                     <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Protocol Type</label>
-                     <select 
-                       value={milestoneForm.type}
-                       onChange={(e) => setMilestoneForm({...milestoneForm, type: e.target.value as any})}
-                       className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236366f1%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.25em] bg-[right_1rem_center] bg-no-repeat"
-                     >
-                       <option value="tasks" className="bg-[#0a0a0c]">TASK COMPLETION</option>
-                       <option value="time" className="bg-[#0a0a0c]">STUDY CAPACITY (MIN)</option>
-                       <option value="streak" className="bg-[#0a0a0c]">CONSISTENCY STREAK</option>
-                     </select>
-                   </div>
-                 </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <CustomSelect 
+                      label="Target Node"
+                      value={milestoneForm.childId}
+                      onChange={(val) => setMilestoneForm({...milestoneForm, childId: val})}
+                      placeholder="SELECT STUDENT"
+                      options={children.map(c => ({ label: c.name.toUpperCase(), value: c.id }))}
+                    />
+                    <CustomSelect 
+                      label="Protocol Type"
+                      value={milestoneForm.type}
+                      onChange={(val) => setMilestoneForm({...milestoneForm, type: val as any})}
+                      options={[
+                        { label: 'TASK COMPLETION', value: 'tasks' },
+                        { label: 'STUDY CAPACITY (MIN)', value: 'time' },
+                        { label: 'CONSISTENCY STREAK', value: 'streak' }
+                      ]}
+                    />
+                  </div>
 
                  <div className="space-y-2">
                    <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Objective Title</label>
@@ -536,19 +617,17 @@ const ParentDashboard = () => {
                        className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground"
                      />
                    </div>
-                   <div className="space-y-2">
-                     <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Reward Badge</label>
-                     <select 
-                       value={milestoneForm.rewardBadge}
-                       onChange={(e) => setMilestoneForm({...milestoneForm, rewardBadge: e.target.value})}
-                       className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase outline-none focus:border-primary/50 text-foreground"
-                     >
-                       <option value="🏅 Neural Pioneer">NEURAL PIONEER</option>
-                       <option value="⚡ Speed Demon">SPEED DEMON</option>
-                       <option value="🧠 Alpha Thinker">ALPHA THINKER</option>
-                       <option value="🔥 Consistency King">CONSISTENCY KING</option>
-                     </select>
-                   </div>
+                    <CustomSelect 
+                      label="Reward Badge"
+                      value={milestoneForm.rewardBadge}
+                      onChange={(val) => setMilestoneForm({...milestoneForm, rewardBadge: val})}
+                      options={[
+                        { label: 'NEURAL PIONEER', value: '🏅 Neural Pioneer' },
+                        { label: 'SPEED DEMON', value: '⚡ Speed Demon' },
+                        { label: 'ALPHA THINKER', value: '🧠 Alpha Thinker' },
+                        { label: 'CONSISTENCY KING', value: '🔥 Consistency King' }
+                      ]}
+                    />
                  </div>
 
                  <button 
