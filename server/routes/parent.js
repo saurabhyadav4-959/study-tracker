@@ -14,7 +14,7 @@ router.post('/link', auth, async (req, res) => {
       return res.status(403).json({ message: 'UNAUTHORIZED: SUPERVISOR ACCESS ONLY' });
     }
 
-    const student = await db.users.findOne({ studentCode, role: 'student' });
+    const student = await db.users.findOne({ studentCode: { $regex: new RegExp(`^${studentCode}$`, 'i') }, role: 'student' });
     if (!student) {
       return res.status(404).json({ message: 'INVALID STUDENT CODE: NODE NOT FOUND' });
     }

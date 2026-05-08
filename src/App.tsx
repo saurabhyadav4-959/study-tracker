@@ -25,30 +25,41 @@ import ParentStudentMirror from './pages/ParentStudentMirror';
 import Onboarding from './pages/Onboarding';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [role, setRole] = useState<string | null>(null);
-  const location = window.location.hash;
+  const { state } = useAppContext();
+  const location = useLocation();
+  const [authChecked, setAuthChecked] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
-    setIsAuthenticated(!!user.token);
-    setRole(user.role || null);
-  }, []);
+    setUserData(user);
+    setAuthChecked(true);
+  }, [location.pathname]);
 
-  if (isAuthenticated === null) return null;
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!authChecked) return null;
+  if (!userData?.token) return <Navigate to="/login" replace />;
+
+  const role = userData.role;
+  const path = location.pathname;
 
   // Force onboarding if role is pending
-  if (role === 'pending' && location !== '#/onboarding') {
+  if (role === 'pending' && path !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
 
-  // Prevent role-dashboard mismatch
-  if (role === 'parent' && (location === '#/dashboard' || location === '#/')) {
-    return <Navigate to="/parent/dashboard" replace />;
+  // Role-based access control
+  if (role === 'parent') {
+    // Parents shouldn't be on student dashboard
+    if (path === '/dashboard') {
+      return <Navigate to="/parent/dashboard" replace />;
+    }
   }
-  if (role === 'student' && location === '#/parent/dashboard') {
-    return <Navigate to="/dashboard" replace />;
+
+  if (role === 'student') {
+    // Students shouldn't be on parent routes
+    if (path.startsWith('/parent')) {
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
   return <>{children}</>;

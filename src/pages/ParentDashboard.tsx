@@ -102,21 +102,27 @@ const CustomSelect = ({ label, value, options, onChange, placeholder }: { label:
               width: coords.width, 
               zIndex: 9999 
             }}
-            className="bg-[#0a0a0c] border-2 border-glass-border rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-3xl"
+            className="bg-[#0a0a0c] border-2 border-primary/30 rounded-2xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.9)] backdrop-blur-3xl"
           >
-            {options.map((opt) => (
-              <div 
-                key={opt.value}
-                onClick={() => {
-                  onChange(opt.value);
-                  setIsOpen(false);
-                }}
-                className={`px-4 py-3 flex items-center justify-between hover:bg-primary/10 hover:text-primary transition-all cursor-pointer text-[10px] font-black uppercase tracking-widest ${value === opt.value ? 'bg-primary/20 text-primary' : 'text-foreground/60'}`}
-              >
-                <span>{opt.label}</span>
-                {value === opt.value && <Check size={12} />}
-              </div>
-            ))}
+            <div className="py-2">
+              {options.map((opt) => (
+                <div 
+                  key={opt.value}
+                  onClick={() => {
+                    onChange(opt.value);
+                    setIsOpen(false);
+                  }}
+                  className={`px-5 py-4 flex items-center justify-between hover:bg-primary/10 hover:text-primary transition-all cursor-pointer text-[10px] font-black uppercase tracking-[0.2em] ${value === opt.value ? 'bg-primary/20 text-primary' : 'text-foreground/70'}`}
+                >
+                  <span className="flex-1">{opt.label}</span>
+                  {value === opt.value && (
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                      <Check size={14} className="text-primary" />
+                    </motion.div>
+                  )}
+                </div>
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -176,7 +182,7 @@ const ParentDashboard = () => {
       const res = await fetch(`${API_BASE_URL}/api/parent/link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
-        body: JSON.stringify({ studentCode: studentCode.trim() })
+        body: JSON.stringify({ studentCode: studentCode.trim().toUpperCase() })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'LINKAGE FAILED');
