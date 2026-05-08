@@ -248,7 +248,17 @@ const ParentStudentMirror = () => {
 // Extracted exact visuals from Dashboard Layout
 const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, timeframe: string, setTimeframe: any }) => {
   const getActiveData = () => {
-    // We map backend logs to chart format
+    // If we have a full dashboard state from the student, use their exact logs
+    if (data.dashboardState && data.dashboardState.activityLogs) {
+      const logs = data.dashboardState.activityLogs;
+      return logs.map((l: any) => ({
+        name: new Date(l.date).toLocaleDateString('en-US', { weekday: 'short' }),
+        productive: l.count || 0,
+        focus: (l.intensity || 0) * 10
+      })).slice(-7); // Last 7 days
+    }
+
+    // Fallback to backend logs if state sync hasn't happened yet
     const dailyData: any = {};
     data.logs.forEach((log: any) => {
       const d = new Date(log.timestamp).toLocaleDateString('en-CA');
@@ -274,11 +284,13 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
     return result;
   };
 
-  const tasksDone = data.tasks.filter((t: any) => t.status === 'Done').length;
-  const totalTasks = data.tasks.length;
-  const skillsCount = data.skills.length;
+  // Use dashboardState for scores if available
+  const s = data.dashboardState || {};
+  const tasksDone = s.tasks ? s.tasks.filter((t: any) => t.status === 'Done').length : data.tasks.filter((t: any) => t.status === 'Done').length;
+  const totalTasks = s.tasks ? s.tasks.length : data.tasks.length;
+  const skillsCount = s.skills ? s.skills.length : data.skills.length;
   const productiveScore = totalTasks > 0 ? Math.round((tasksDone / totalTasks) * 100) : 0;
-  const hasActivity = data.logs && data.logs.length > 0;
+  const hasActivity = (data.logs && data.logs.length > 0) || (s.activityLogs && s.activityLogs.some((l: any) => l.count > 0));
 
   return (
     <div className="space-y-12">

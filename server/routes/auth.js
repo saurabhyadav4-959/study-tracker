@@ -190,4 +190,15 @@ router.get('/status', auth, async (req, res) => {
   }
 });
 
+// Sync full dashboard state
+router.post('/state', auth, async (req, res) => {
+  try {
+    const { state } = req.body;
+    await db.users.update(req.user.id, { dashboardState: state });
+    res.json({ message: 'NEURAL STATE SYNCHRONIZED' });
+  } catch (err) {
+    res.status(500).json({ message: 'SYNC ERROR', error: err.message });
+  }
+});
+
 module.exports = router;

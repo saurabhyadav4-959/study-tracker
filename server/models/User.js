@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['student', 'parent', 'pending'], default: 'pending' },
   studentCode: { type: String, unique: true, sparse: true },
   linkedChildren: [{ type: String }],
+  dashboardState: { type: Object, default: null },
   createdAt: { type: Date, default: Date.now }
 });
 

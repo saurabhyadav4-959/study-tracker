@@ -137,7 +137,8 @@ router.get('/child/:id', auth, async (req, res) => {
     res.json({
       profile: { id: child._id, name: child.name, email: child.email, xp: child.xp || 0, level: child.level || 1 },
       tasks,
-      logs: logs.slice(0, 50)
+      logs: logs.slice(0, 50),
+      dashboardState: child.dashboardState
     });
   } catch (err) {
     res.status(500).json({ message: 'DEEP SCAN FAILED', error: err.message });

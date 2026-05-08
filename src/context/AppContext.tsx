@@ -127,7 +127,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }
         
         // Initial Login Log
-        logActivity('LOGIN', `Node ${user.name} initialized connection`);
+        logActivity('LOGIN', `Operational Link Established: Node ${user.name} online`);
         
         // Initial Restriction Check
         checkRestrictions();
@@ -171,15 +171,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       
       // Sync Tasks to Backend
       const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
-      if (user.token && state.tasks.length > 0) {
-        fetch(`${API_BASE_URL}/api/tasks/sync`, {
+      if (user.token) {
+        // Sync Tasks
+        if (state.tasks.length > 0) {
+          fetch(`${API_BASE_URL}/api/tasks/sync`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${user.token}`
+            },
+            body: JSON.stringify({ tasks: state.tasks })
+          }).catch(err => console.error('Task sync failed', err));
+        }
+
+        // Sync Full Dashboard State (for Parent Mirror)
+        fetch(`${API_BASE_URL}/api/auth/state`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${user.token}`
           },
-          body: JSON.stringify({ tasks: state.tasks })
-        }).catch(e => console.error('SYNC ERROR', e));
+          body: JSON.stringify({ state })
+        }).catch(err => console.error('Full state sync failed', err));
       }
     }
   }, [state, activeUserKey]);
