@@ -58,9 +58,9 @@ const SupervisorFeed = () => {
   const uniqueStudents = Array.from(new Set(logs.map(log => log.childName)));
 
   const filteredLogs = logs.filter(log => {
-    const matchesText = log.childName.toLowerCase().includes(filter.toLowerCase()) ||
-                        log.description.toLowerCase().includes(filter.toLowerCase()) ||
-                        log.actionType.toLowerCase().includes(filter.toLowerCase());
+    const matchesText = (log.childName || '').toLowerCase().includes(filter.toLowerCase()) ||
+                        (log.description || '').toLowerCase().includes(filter.toLowerCase()) ||
+                        (log.actionType || '').toLowerCase().includes(filter.toLowerCase());
     const matchesStudent = selectedStudent === '' || log.childName === selectedStudent;
     return matchesText && matchesStudent;
   });

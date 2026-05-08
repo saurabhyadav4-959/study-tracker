@@ -202,7 +202,7 @@ const ParentStudentMirror = () => {
                       selectedId === c.id ? 'bg-primary/10 text-primary' : 'text-foreground/70'
                     }`}
                   >
-                    <span>{c.name.toUpperCase()}</span>
+                    <span>{(c.name || '').toUpperCase()}</span>
                     {selectedId === c.id && <Check size={12} />}
                   </button>
                 ))
