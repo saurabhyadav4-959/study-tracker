@@ -271,12 +271,11 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
           <div className="glass-card p-10 border-2 border-glass-border relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent pointer-events-none" />
             <div className="flex justify-between items-center mb-12 relative z-10">
-              <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-8 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <BarChart3 size={16} />
-                  Neural Flux Capacitors
-                </div>
-                <div className="flex gap-2">
+              <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+                <BarChart3 size={16} />
+                Neural Flux Capacitors
+              </h3>
+              <div className="flex gap-2">
                 {['W', 'M', 'Y'].map(t => (
                   <button 
                     key={t} 
