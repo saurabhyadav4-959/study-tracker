@@ -6,9 +6,9 @@
  * In production, it targets the hosted backend URL.
  */
 
-export const API_BASE_URL = import.meta.env.PROD 
+export const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD 
   ? 'https://study-tracker-56a2.onrender.com' 
-  : 'http://localhost:5000';
+  : 'http://localhost:5000');
 
 // Optional: Add a helper for cleaner fetch calls
 export const getApiUrl = (path: string) => {
