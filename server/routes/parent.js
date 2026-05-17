@@ -173,4 +173,29 @@ router.get('/activity-feed', auth, async (req, res) => {
   }
 });
 
+// Assign an alert/task to a student
+router.post('/assign-alert', auth, async (req, res) => {
+  try {
+    const parentId = req.user.id;
+    const { studentId, taskName, priority } = req.body;
+
+    const link = await db.parent_student_links.findOne({ parentId, studentId });
+    if (!link) {
+      return res.status(403).json({ message: 'UNAUTHORIZED: STUDENT NOT LINKED' });
+    }
+
+    const alert = await db.alerts.insert({
+      userId: studentId,
+      parentId,
+      taskName,
+      priority,
+      read: false
+    });
+
+    res.json({ message: 'OBJECTIVE ASSIGNED', alert });
+  } catch (err) {
+    res.status(500).json({ message: 'ASSIGNMENT FAILED', error: err.message });
+  }
+});
+
 module.exports = router;

@@ -47,9 +47,7 @@ interface ChildNode {
 
 const CustomSelect = ({ label, value, options, onChange, placeholder }: { label: string, value: string, options: { label: string, value: string }[], onChange: (val: string) => void, placeholder?: string }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -61,26 +59,13 @@ const CustomSelect = ({ label, value, options, onChange, placeholder }: { label:
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const handleToggle = () => {
-    if (triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setCoords({ 
-        top: rect.bottom + window.scrollY + 8, 
-        left: rect.left + window.scrollX, 
-        width: rect.width 
-      });
-    }
-    setIsOpen(!isOpen);
-  };
-
   const selectedOption = options.find(o => o.value === value);
 
   return (
     <div className="space-y-2 relative" ref={containerRef}>
       <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">{label}</label>
       <div 
-        ref={triggerRef}
-        onClick={handleToggle}
+        onClick={() => setIsOpen(!isOpen)}
         className="w-full bg-background border border-glass-border p-4 rounded-xl text-xs font-black uppercase flex items-center justify-between cursor-pointer hover:border-primary/50 transition-all text-foreground"
       >
         <span className={!selectedOption ? 'text-foreground/40' : ''}>
@@ -92,19 +77,12 @@ const CustomSelect = ({ label, value, options, onChange, placeholder }: { label:
       <AnimatePresence>
         {isOpen && (
           <motion.div 
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            style={{ 
-              position: 'fixed', 
-              top: coords.top - window.scrollY, 
-              left: coords.left - window.scrollX, 
-              width: coords.width, 
-              zIndex: 9999 
-            }}
-            className="bg-[#0a0a0c] border-2 border-primary/30 rounded-2xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.9)] backdrop-blur-3xl"
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            className="absolute top-full left-0 right-0 mt-2 bg-[#0a0a0c] border-2 border-primary/30 rounded-2xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.9)] backdrop-blur-3xl z-[99999]"
           >
-            <div className="py-2">
+            <div className="py-2 max-h-60 overflow-y-auto custom-scrollbar">
               {options.map((opt) => (
                 <div 
                   key={opt.value}
@@ -264,7 +242,7 @@ const ParentDashboard = () => {
   const globalAlerts = children.flatMap(c => (c.alerts || []).map(a => ({ ...a, childName: c.name || 'Unknown Node' })));
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700">
+    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700">
       {/* 1. Header & Quick Summary */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 border-b border-glass-border pb-8 text-foreground">
         <div>
@@ -334,13 +312,13 @@ const ParentDashboard = () => {
                     value={studentCode}
                     onChange={(e) => { setStudentCode(e.target.value); setError(''); }}
                     placeholder="ENTER STUDENT UNIQUE ID..." 
-                    className="w-full h-12 md:h-14 bg-background border-2 border-glass-border rounded-2xl pl-12 pr-6 text-[10px] font-black uppercase tracking-widest outline-none focus:border-primary/40 focus:bg-foreground/5 transition-all cursor-text placeholder:text-foreground/20 text-foreground" 
+                    className="w-full h-12 bg-background border-2 border-glass-border rounded-2xl pl-12 pr-6 text-[10px] font-black uppercase tracking-widest outline-none focus:border-primary/40 focus:bg-foreground/5 transition-all cursor-text placeholder:text-foreground/20 text-foreground" 
                   />
                 </div>
                 <button 
                   type="submit"
                   disabled={!studentCode}
-                  className="h-12 md:h-14 bg-primary hover:bg-primary/80 text-white px-6 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-30 disabled:pointer-events-none group shadow-[0_10px_30px_rgba(99,102,241,0.2)] hover:shadow-[0_15px_40px_rgba(99,102,241,0.4)]"
+                  className="h-12 bg-primary hover:bg-primary/80 text-white px-6 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-30 disabled:pointer-events-none group shadow-[0_10px_30px_rgba(99,102,241,0.2)] hover:shadow-[0_15px_40px_rgba(99,102,241,0.4)]"
                 >
                   <Users size={18} className="group-hover:scale-110 transition-transform" />
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap">Connect Node</span>
@@ -524,54 +502,8 @@ const ParentDashboard = () => {
         </div>
       </div>
 
-      {/* 5. Strategic Reports (Simplified - EXACTLY 2) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-6">
-         <div className="glass-card p-10 border-2 border-glass-border">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-10 flex items-center gap-3 italic">
-              <BarChart3 size={16} /> 01 • Weekly Capacity Sync
-            </h3>
-            <div className="h-64">
-               <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={children}>
-                     <XAxis dataKey="name" stroke="currentColor" strokeOpacity={0.1} tick={{ fontSize: 10, fontWeight: 900 }} />
-                     <YAxis hide />
-                     <Tooltip 
-                       contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--glass-border)', borderRadius: '12px' }}
-                       itemStyle={{ color: 'var(--primary)', textTransform: 'uppercase', fontWeight: 900, fontSize: '10px' }}
-                     />
-                     <Bar dataKey="totalStudyTime" fill="var(--primary)" radius={[8, 8, 0, 0]} barSize={40} />
-                  </BarChart>
-               </ResponsiveContainer>
-            </div>
-         </div>
-
-         <div className="glass-card p-10 border-2 border-glass-border">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary mb-10 flex items-center gap-3 italic">
-              <TrendingUp size={16} /> 02 • Global Task Distribution
-            </h3>
-            <div className="h-64">
-               <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                     <Pie
-                       data={children}
-                       dataKey="completedTasks"
-                       nameKey="name"
-                       cx="50%"
-                       cy="50%"
-                       innerRadius={60}
-                       outerRadius={90}
-                     >
-                        {children.map((_, index) => <Cell key={index} fill={COLORS[index % COLORS.length]} stroke="none" />)}
-                     </Pie>
-                     <Tooltip 
-                       contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--glass-border)', borderRadius: '12px' }}
-                       itemStyle={{ textTransform: 'uppercase', fontWeight: 900, fontSize: '10px' }}
-                     />
-                  </PieChart>
-               </ResponsiveContainer>
-            </div>
-         </div>
-
+      {/* 5. Strategic Reports (Simplified - EXACTLY 2) - REMOVED BY USER REQUEST */}
+      <div>
          {/* 6. Milestone Deployment Modal */}
          {isMilestoneModalOpen && (
            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md text-white">

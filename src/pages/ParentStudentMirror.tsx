@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { API_BASE_URL } from '../config';
 import { 
   Zap, Clock, Layers, TrendingUp, 
-  BarChart3, Target, Flame, Activity, Timer, ChevronRight, ChevronDown, Check, Radio
+  BarChart3, Target, Flame, Activity, Timer, ChevronRight, ChevronDown, Check, Radio,
+  Brain, ShieldAlert, Sparkles, Loader2
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import EmptyChart from '../components/EmptyChart';
@@ -80,7 +81,7 @@ const ParentStudentMirror = () => {
   const [timeframe, setTimeframe] = useState('W');
 
   const [dropOpen, setDropOpen] = useState(false);
-  const [dropPos, setDropPos] = useState({ top: 0, left: 0, width: 0 });
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0, width: 0, isUp: false });
   const dropRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -99,7 +100,15 @@ const ParentStudentMirror = () => {
   const handleDropToggle = () => {
     if (btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
-      setDropPos({ top: rect.bottom + window.scrollY + 8, left: rect.left + window.scrollX, width: rect.width });
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const shouldOpenUp = spaceBelow < 200;
+      
+      setDropPos({ 
+        top: shouldOpenUp ? rect.top - 8 : rect.bottom + 8, 
+        left: rect.left, 
+        width: rect.width,
+        isUp: shouldOpenUp
+      });
     }
     setDropOpen(p => !p);
   };
@@ -108,9 +117,12 @@ const ParentStudentMirror = () => {
     fetchChildren();
     const interval = setInterval(() => {
       fetchChildren();
-      if (selectedId) performDeepScan(selectedId);
     }, 10000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (selectedId) performDeepScan(selectedId, true);
   }, [selectedId]);
 
   const fetchChildren = async () => {
@@ -136,8 +148,8 @@ const ParentStudentMirror = () => {
     }
   };
 
-  const performDeepScan = async (childId: string) => {
-    setScanLoading(true);
+  const performDeepScan = async (childId: string, silent = false) => {
+    if (!silent) setScanLoading(true);
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     try {
       const res = await fetch(`${API_BASE_URL}/api/parent/child/${childId}`, {
@@ -178,8 +190,8 @@ const ParentStudentMirror = () => {
             <Activity size={12} className="animate-pulse" />
             Supervisor Protocol active
           </div>
-          <h1 className="text-5xl font-black tracking-tighter uppercase leading-tight text-foreground">Node Dashboard</h1>
-          <p className="text-foreground/40 font-semibold tracking-wide">Select a student node to mirror their active dashboard and operations.</p>
+          <h1 className="text-5xl font-black tracking-tighter uppercase leading-tight text-foreground">Node Navigator</h1>
+          <p className="text-foreground/40 font-semibold tracking-wide">Synthesize a real-time mirror of any active student node in your network.</p>
         </div>
         
         <div className="flex gap-4">
@@ -201,8 +213,15 @@ const ParentStudentMirror = () => {
           {dropOpen && (
             <div
               ref={dropRef}
-              style={{ position: 'fixed', top: dropPos.top, left: dropPos.left, width: dropPos.width, zIndex: 9999 }}
-              className="bg-background border border-glass-border rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+              style={{ 
+                position: 'fixed', 
+                top: dropPos.top, 
+                left: dropPos.left, 
+                width: dropPos.width, 
+                zIndex: 9999,
+                transform: dropPos.isUp ? 'translateY(-100%)' : 'none'
+              }}
+              className="bg-background border border-glass-border rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] animate-in fade-in duration-200"
             >
               {children.length === 0 ? (
                 <div className="px-4 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/30 text-center">
@@ -231,15 +250,29 @@ const ParentStudentMirror = () => {
         </div>
       </div>
 
-      {!data || scanLoading ? (
+      {!selectedId ? (
+         <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-6 text-center bg-foreground/[0.02] border-2 border-dashed border-glass-border rounded-[3rem]">
+            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center text-primary animate-bounce">
+               <Layers size={40} />
+            </div>
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Awaiting Neural Connection</p>
+              <h2 className="text-xl font-black text-foreground/60">Select a student node from the dropdown to begin mirroring</h2>
+            </div>
+         </div>
+      ) : !data || scanLoading ? (
          <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-6 text-center">
             <div className="w-16 h-16 bg-foreground/5 rounded-full flex items-center justify-center text-foreground/20 animate-pulse border-2 border-glass-border border-dashed">
                <Activity size={32} />
             </div>
-            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-foreground/40">Synchronizing Mirror Sequence...</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-foreground/40 uppercase">Synchronizing Mirror Sequence...</p>
          </div>
       ) : (
-        <MirrorDashboardView data={data} timeframe={timeframe} setTimeframe={setTimeframe} />
+        <MirrorDashboardView 
+          data={data} 
+          timeframe={timeframe} 
+          setTimeframe={setTimeframe} 
+        />
       )}
     </div>
   );
@@ -249,19 +282,29 @@ const ParentStudentMirror = () => {
 const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, timeframe: string, setTimeframe: any }) => {
   const getActiveData = () => {
     // If we have a full dashboard state from the student, use their exact logs
-    if (data.dashboardState && data.dashboardState.activityLogs) {
+    if (data.dashboardState && Array.isArray(data.dashboardState.activityLogs)) {
       const logs = data.dashboardState.activityLogs;
-      return logs.map((l: any) => ({
-        name: new Date(l.date).toLocaleDateString('en-US', { weekday: 'short' }),
-        productive: l.count || 0,
-        focus: (l.intensity || 0) * 10
-      })).slice(-7); // Last 7 days
+      return logs.map((l: any) => {
+        const dateVal = l.date ? new Date(l.date) : new Date();
+        const isValidDate = !isNaN(dateVal.getTime());
+        return {
+          name: isValidDate ? dateVal.toLocaleDateString('en-US', { weekday: 'short' }) : '?',
+          productive: l.count || 0,
+          focus: (l.intensity || 0) * 10
+        };
+      }).slice(-7); // Last 7 days
     }
 
     // Fallback to backend logs if state sync hasn't happened yet
+    if (!Array.isArray(data.logs)) return [];
+    
     const dailyData: any = {};
     data.logs.forEach((log: any) => {
-      const d = new Date(log.timestamp).toLocaleDateString('en-CA');
+      if (!log.timestamp) return;
+      const dateVal = new Date(log.timestamp);
+      if (isNaN(dateVal.getTime())) return;
+      
+      const d = dateVal.toLocaleDateString('en-CA');
       if (!dailyData[d]) dailyData[d] = { count: 0, intensity: 0 };
       dailyData[d].count += 1;
       dailyData[d].intensity += 1;
@@ -284,29 +327,87 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
     return result;
   };
 
-  // Use dashboardState for scores if available
   const s = data.dashboardState || {};
   const tasksDone = s.tasks ? s.tasks.filter((t: any) => t.status === 'Done').length : data.tasks.filter((t: any) => t.status === 'Done').length;
   const totalTasks = s.tasks ? s.tasks.length : data.tasks.length;
   const skillsCount = s.skills ? s.skills.length : data.skills.length;
   const productiveScore = totalTasks > 0 ? Math.round((tasksDone / totalTasks) * 100) : 0;
+  const focusMinutes = s.pomodoro?.totalMinutes || 0;
+  const focusScore = Math.min(100, Math.round((focusMinutes / 300) * 100));
   const hasActivity = (data.logs && data.logs.length > 0) || (s.activityLogs && s.activityLogs.some((l: any) => l.count > 0));
+  const milestones = s.milestones || data.milestones || [];
 
   return (
     <div className="space-y-12">
-      {/* 1. Stat Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* 0. Top Metrics Row (Matching Overview) */}
+      <div className="flex flex-wrap items-center gap-6 justify-end">
+          <div className="px-6 py-3 bg-foreground/5 border border-glass-border rounded-2xl flex items-center gap-4 shrink-0">
+            <div className="text-right">
+              <p className="text-sm font-black uppercase tracking-widest text-foreground/40 mb-1 leading-none">Intelligence Index</p>
+              <p className="text-xl font-black text-primary leading-none">{100 + (skillsCount * 2) + Math.floor(focusMinutes / 60)} <span className="text-xs text-foreground/40 italic">iQ</span></p>
+            </div>
+          </div>
+          
+          <div className="px-6 py-3 bg-foreground/5 border border-glass-border rounded-2xl flex items-center gap-4 shrink-0">
+            <div className="text-right">
+              <p className="text-sm font-black uppercase tracking-widest text-foreground/40 mb-1 leading-none">Core Stability</p>
+              <p className="text-xl font-black text-green-500 leading-none">{productiveScore}%</p>
+            </div>
+          </div>
+      </div>
+
+      {/* 1. Primary Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <StatCard title="Productive Score" value={productiveScore} subtitle="/ 100" icon={TrendingUp} color="primary" trend={productiveScore > 0 ? 5 : 0} />
-        <StatCard title="Total XP Points" value={data.profile.xp || 0} subtitle="pts" icon={Zap} color="secondary" />
+        <StatCard title="Focus Score" value={focusMinutes} subtitle="min" icon={Zap} color="secondary" trend={focusMinutes > 0 ? 2 : 0} />
         <StatCard title="Tasks Complete" value={`${tasksDone}/${totalTasks}`} subtitle="total" icon={Target} color="primary" />
         <StatCard title="Skills Mastered" value={skillsCount} subtitle="nodes" icon={Layers} color="green-400" trend={skillsCount > 0 ? 1 : 0} />
       </div>
 
-      {/* 2. Main Analytics Row */}
+      {/* 2. Active Milestones (Neural Goals) */}
+      {milestones.length > 0 && (
+        <div className="space-y-6">
+          <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+             <Target size={16} /> Active Neural Objectives
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {milestones.map((m: any) => (
+              <div key={m._id} className={`glass-card p-6 border-2 relative overflow-hidden group ${m.status === 'completed' ? 'border-green-500/20 bg-green-500/5' : 'border-primary/20 bg-primary/5'}`}>
+                <div className="absolute -right-4 -top-4 opacity-5 pointer-events-none group-hover:scale-110 transition-transform">
+                   <Zap size={100} />
+                </div>
+                <div className="flex justify-between items-start mb-6 relative z-10">
+                   <div>
+                      <h4 className="text-lg font-black tracking-tight uppercase mb-1">{m.title}</h4>
+                      <div className="flex items-center gap-2">
+                         <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${m.status === 'completed' ? 'bg-green-500/20 text-green-500' : 'bg-primary/20 text-primary'}`}>
+                           {m.status}
+                         </span>
+                         <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">{m.rewardBadge}</span>
+                      </div>
+                   </div>
+                   {m.status === 'completed' && <div className="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center shadow-inner animate-in zoom-in duration-500"><Check size={24} /></div>}
+                </div>
+                
+                <div className="space-y-2 relative z-10">
+                   <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-foreground/40">
+                      <span>Neural Progress</span>
+                      <span>Target: {m.targetValue}</span>
+                   </div>
+                   <div className="h-2 w-full bg-foreground/5 rounded-full overflow-hidden border border-glass-border">
+                      <div className={`h-full transition-all duration-1000 ${m.status === 'completed' ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)]' : 'bg-primary'}`} style={{ width: m.status === 'completed' ? '100%' : '20%' }} />
+                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 3. Main Analytics Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Left: Chart and Detailed Logs */}
-        <div className="lg:col-span-2 space-y-12">
-          {/* Chart Card */}
+        {/* Left: Performance Hub */}
+        <div className="lg:col-span-2 space-y-8">
           <div className="glass-card p-10 border-2 border-glass-border relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent pointer-events-none" />
             <div className="flex justify-between items-center mb-12 relative z-10">
@@ -314,16 +415,23 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
                 <BarChart3 size={16} />
                 Neural Flux Capacitors
               </h3>
-              <div className="flex gap-2">
-                {['W', 'M', 'Y'].map(t => (
-                  <button 
-                    key={t} 
-                    onClick={() => setTimeframe(t)}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${timeframe === t ? 'bg-primary text-white shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'bg-foreground/5 text-foreground/40 hover:bg-foreground/10'}`}
-                  >
-                    {t}
+              <div className="flex items-center gap-4">
+                {!hasActivity && (
+                  <button className="text-[10px] font-black uppercase tracking-widest text-primary/40 hover:text-primary transition-colors border border-primary/20 px-3 py-1 rounded-lg">
+                    Awaiting Sync
                   </button>
-                ))}
+                )}
+                <div className="flex gap-2">
+                  {['W', 'M', 'Y'].map(t => (
+                    <button 
+                      key={t} 
+                      onClick={() => setTimeframe(t)}
+                      className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${timeframe === t ? 'bg-primary text-white shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'bg-foreground/5 text-foreground/40 hover:bg-foreground/10'}`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
             
@@ -333,18 +441,36 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
                   <AreaChart data={getActiveData()} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorProd" x1="0" y1="0" x2="0" y2="1">
-                         <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
-                         <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorFocus" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#a855f7" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.05} vertical={false} />
-                    <XAxis dataKey="name" stroke="currentColor" opacity={0.3} tick={{ fill: 'currentColor', fontSize: 10, fontWeight: 900, opacity: 0.6 }} tickLine={false} axisLine={false} />
-                    <YAxis stroke="currentColor" opacity={0.3} tick={{ fill: 'currentColor', fontSize: 10, fontWeight: 900, opacity: 0.6 }} tickLine={false} axisLine={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                    <XAxis 
+                      dataKey="name" 
+                      stroke="#ffffff30" 
+                      tick={{ fill: '#ffffff60', fontSize: 10, fontWeight: 900, fontFamily: 'monospace' }} 
+                      tickLine={false} 
+                      axisLine={false}
+                      minTickGap={30}
+                      dy={10}
+                    />
+                    <YAxis 
+                      stroke="#ffffff30" 
+                      tick={{ fill: '#ffffff60', fontSize: 10, fontWeight: 900 }} 
+                      tickLine={false} 
+                      axisLine={false}
+                    />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--glass-border)', borderRadius: '12px' }} 
-                      itemStyle={{ color: 'var(--foreground)', fontWeight: 900 }} 
+                      contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--glass-border)', borderRadius: '12px' }}
+                      itemStyle={{ color: 'var(--foreground)', fontWeight: 900 }}
                     />
                     <Area type="monotone" dataKey="productive" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorProd)" />
+                    <Area type="monotone" dataKey="focus" stroke="#a855f7" strokeWidth={3} fillOpacity={1} fill="url(#colorFocus)" />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
@@ -352,115 +478,73 @@ const MirrorDashboardView = ({ data, timeframe, setTimeframe }: { data: any, tim
               )}
             </div>
           </div>
-
-          {/* Detailed Neural Activity Log */}
-          <div className="glass-card p-8 border-2 border-glass-border relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent pointer-events-none" />
-            <div className="flex justify-between items-center mb-10 relative z-10">
-              <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
-                <Activity size={18} className="text-primary" />
-                Detailed Neural Activity Log
-              </h3>
-              <div className="px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">
-                Live Stream Active
-              </div>
-            </div>
-
-            <div className="space-y-4 relative z-10">
-              {data.logs.length === 0 ? (
-                <div className="py-20 text-center space-y-4">
-                  <Radio size={40} className="mx-auto text-foreground/10 animate-pulse" />
-                  <p className="text-xs font-black uppercase tracking-[0.3em] text-foreground/20 italic">Awaiting neural transmissions...</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-3">
-                  {data.logs.map((log: any, idx: number) => (
-                    <div key={idx} className="flex items-center gap-6 p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 hover:bg-primary/[0.02] transition-all group/item">
-                      <div className="w-12 h-12 rounded-xl bg-background border border-glass-border flex flex-col items-center justify-center shrink-0">
-                        <span className="text-[10px] font-black text-primary leading-none">
-                          {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', hour12: false })}
-                        </span>
-                        <span className="text-[8px] font-bold text-foreground/30 uppercase tracking-tighter leading-none mt-1">
-                          :{new Date(log.timestamp).toLocaleTimeString([], { minute: '2-digit' })}
-                        </span>
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-1">
-                          <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest ${
-                            log.actionType === 'LOGIN' ? 'bg-blue-500/10 text-blue-500' :
-                            log.actionType === 'COMPLETE_TASK' ? 'bg-green-500/10 text-green-500' :
-                            'bg-primary/10 text-primary'
-                          }`}>
-                            {log.actionType}
-                          </span>
-                          <span className="text-[10px] font-bold text-foreground/30 uppercase tracking-widest">
-                            {new Date(log.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                          </span>
-                        </div>
-                        <p className="text-sm font-bold text-foreground/80 truncate">{log.description}</p>
-                      </div>
-
-                      <div className="hidden md:flex flex-col items-end shrink-0">
-                        <div className="flex items-center gap-1 text-primary">
-                          <Clock size={10} />
-                          <span className="text-[10px] font-black uppercase tracking-widest">
-                            {log.timeSpent > 0 ? `${log.timeSpent}m` : 'Event'}
-                          </span>
-                        </div>
-                        <p className="text-[8px] font-black uppercase tracking-[0.2em] text-foreground/20 mt-1">Status: Logged</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
-        {/* Right: Core Execution (Circular Progress) */}
-        <div className="lg:col-span-1 border-2 border-glass-border glass-card p-10 h-fit relative overflow-hidden flex flex-col group">
+        {/* Right: Biological Sync */}
+        <div className="lg:col-span-1">
+          <div className="glass-card p-10 border-2 border-glass-border h-full relative overflow-hidden flex flex-col group">
              <div className="absolute -top-12 -right-12 text-primary opacity-5 group-hover:opacity-10 transition-all duration-700">
               <Flame size={240} />
             </div>
             
-            <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-12 flex items-center gap-3 relative z-10">
+            <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-12 flex items-center gap-3">
               <Flame size={16} />
-              Core Execution
+              Biological Sync
             </h3>
             
-            <div className="flex flex-col justify-center items-center relative z-10 w-full mb-10">
+            <div className="flex-1 flex flex-col justify-center items-center relative z-10">
               <div className="relative w-56 h-56">
                 <svg className="w-full h-full -rotate-90 scale-110">
                   <circle cx="112" cy="112" r="90" fill="transparent" stroke="currentColor" strokeWidth="2" className="text-white/5" />
                   <circle 
-                    cx="112" cy="112" r="90" fill="transparent" stroke="currentColor" strokeWidth="4" 
-                    strokeDasharray={565} strokeDashoffset={565 * (1 - (productiveScore / 100))} 
+                    cx="112" cy="112" r="90" 
+                    fill="transparent" 
+                    stroke="currentColor" 
+                    strokeWidth="4" 
+                    strokeDasharray={565} 
+                    strokeDashoffset={565 * (1 - (focusScore / 100))} 
                     className="text-primary transition-all duration-1000 shadow-[0_0_20px_rgba(99,102,241,0.5)]" 
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-6xl font-black text-foreground leading-none tracking-tighter">{productiveScore}<span className="text-xl text-foreground/40 font-bold ml-1">%</span></span>
-                  <p className="text-[10px] uppercase tracking-[0.4em] font-black text-primary mt-4 animate-pulse">Sync Rate</p>
+                  <span className="text-6xl font-black text-foreground leading-none tracking-tighter">{focusScore}<span className="text-xl text-foreground/40 font-bold ml-1">%</span></span>
+                  <p className="text-sm uppercase tracking-[0.4em] font-black text-primary mt-4 animate-pulse">{focusScore > 80 ? 'Optimal State' : focusScore > 40 ? 'Active Sync' : 'Standby Mode'}</p>
+                </div>
+              </div>
+
+              <div className="mt-16 space-y-8 w-full">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-xs font-black uppercase tracking-[0.2em]">
+                    <span className="text-foreground/40">Neural Energy</span>
+                    <span className="text-primary">{Math.min(100, Math.floor(focusMinutes / 2))}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/5">
+                    <div className="h-full bg-primary rounded-full transition-all duration-1000" style={{ width: `${Math.min(100, Math.floor(focusMinutes / 2))}%` }} />
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-xs font-black uppercase tracking-[0.2em]">
+                    <span className="text-foreground/40">Metabolic Logic</span>
+                    <span className="text-secondary">{productiveScore}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/5">
+                    <div className="h-full bg-secondary rounded-full shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all duration-1000" style={{ width: `${productiveScore}%` }} />
+                  </div>
                 </div>
               </div>
             </div>
             
-            <div className="pt-10 border-t border-glass-border relative z-10 w-full">
-              <h4 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">Node Objectives</h4>
-              <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2">
-                {data.tasks.length === 0 ? (
-                  <p className="text-[9px] font-black uppercase text-foreground/20 italic text-center py-4">No objectives assigned.</p>
-                ) : (
-                  data.tasks.map((t: any, i: number) => (
-                    <div key={i} className="flex items-center justify-between p-3 bg-foreground/5 rounded-xl border border-glass-border hover:bg-primary/5 transition-all">
-                      <span className={`text-[10px] font-bold uppercase truncate ${t.status === 'Done' ? 'line-through text-foreground/20' : 'text-foreground/70'}`}>{t.title}</span>
-                      <span className={`text-[8px] font-black uppercase px-2 py-1 rounded-md ${t.status === 'Done' ? 'bg-green-500/20 text-green-500' : 'bg-primary/20 text-primary'}`}>{t.status}</span>
-                    </div>
-                  ))
-                )}
+            <div className="mt-auto pt-10 border-t border-glass-border relative z-10">
+              <div className="p-4 bg-primary/5 border border-primary/20 rounded-2xl flex items-center justify-between group-hover:bg-primary/10 transition-colors">
+                <div className="flex items-center gap-3">
+                  <Timer size={18} className="text-primary" />
+                  <span className="text-xs font-black uppercase tracking-widest text-foreground/60">System Synchronized</span>
+                </div>
+                <Check size={14} className="text-foreground/40" />
               </div>
             </div>
+          </div>
         </div>
       </div>
     </div>

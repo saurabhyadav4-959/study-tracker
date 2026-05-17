@@ -15,6 +15,8 @@ export interface UserProfile {
   email: string;
   status: string;
   academicStream: 'Engineering' | 'Medical' | 'Commerce' | 'Humanities';
+  isLocked?: boolean;
+  lockMessage?: string;
 }
 
 export interface AuthUser {

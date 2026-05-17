@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { MessageSquare, X } from 'lucide-react';
+import { MessageSquare, X, AlertOctagon } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 const NotificationSystem = () => {
   const { state, dispatch } = useAppContext();
@@ -41,6 +42,57 @@ const NotificationSystem = () => {
     return () => clearInterval(interval);
   }, [state.alerts, dispatch]);
 
+  useEffect(() => {
+    const checkParentAlerts = async () => {
+      if (activeToast) return; // Don't interrupt an existing toast
+      const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+      if (!user.token || user.role !== 'student') return;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/auth/alerts/pending`, {
+          headers: { 'Authorization': `Bearer ${user.token}` }
+        });
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const parentAlert = data[0];
+          setActiveToast({
+            ...parentAlert,
+            isParentAlert: true,
+            contact: 'Supervisor Directive',
+            taskName: parentAlert.taskName,
+            priority: parentAlert.priority || 'Medium'
+          });
+
+          if ("Notification" in window && Notification.permission === "granted") {
+            try {
+              new Notification(`SUPERVISOR DIRECTIVE: ${parentAlert.taskName}`, {
+                body: `Priority: ${parentAlert.priority || 'Medium'}`,
+                icon: '/vite.svg'
+              });
+            } catch (e) {}
+          }
+        }
+      } catch (err) {}
+    };
+
+    const parentInterval = setInterval(checkParentAlerts, 10000); // Check every 10s
+    return () => clearInterval(parentInterval);
+  }, [activeToast]);
+
+  const handleAcknowledge = async () => {
+    if (activeToast?.isParentAlert) {
+      const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
+      try {
+        await fetch(`${API_BASE_URL}/api/auth/alerts/mark-read`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
+          body: JSON.stringify({ alertId: activeToast._id })
+        });
+      } catch(e) {}
+    }
+    setActiveToast(null);
+  };
+
   if (!activeToast) return null;
 
   return (
@@ -51,11 +103,17 @@ const NotificationSystem = () => {
         
         <div className="flex justify-between items-start mb-4 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)] flex items-center justify-center text-white">
-              <MessageSquare size={20} />
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white ${
+              activeToast.priority === 'High' ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]' :
+              activeToast.priority === 'Medium' ? 'bg-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]' :
+              'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]'
+            }`}>
+              {activeToast.priority === 'High' ? <AlertOctagon size={20} /> : <MessageSquare size={20} />}
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Messages • Now</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">
+                {activeToast.isParentAlert ? `Priority: ${activeToast.priority}` : 'Messages • Now'}
+              </p>
               <p className="text-sm font-bold text-foreground">{activeToast.contact || 'System Bridge'}</p>
             </div>
           </div>
@@ -69,8 +127,14 @@ const NotificationSystem = () => {
 
         <div className="bg-white/5 rounded-2xl p-4 border border-white/5 relative z-10">
           <p className="text-sm text-foreground/80 leading-relaxed font-medium">
-            <span className="text-primary font-black uppercase tracking-widest text-[10px] block mb-1">Signal Protocol:</span>
-            "{activeToast.taskName} initialization required now. Neural sync established at bridge node."
+            <span className={`font-black uppercase tracking-widest text-[10px] block mb-1 ${
+              activeToast.priority === 'High' ? 'text-red-400' :
+              activeToast.priority === 'Medium' ? 'text-yellow-400' :
+              'text-primary'
+            }`}>
+              {activeToast.isParentAlert ? 'DIRECTIVE ISSUED:' : 'Signal Protocol:'}
+            </span>
+            "{activeToast.taskName}"
           </p>
         </div>
 
@@ -79,11 +143,15 @@ const NotificationSystem = () => {
             onClick={() => setActiveToast(null)} 
             className="flex-1 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-foreground/60"
           >
-            Clear
+            Dismiss
           </button>
           <button 
-            onClick={() => setActiveToast(null)} 
-            className="flex-1 py-3 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:scale-105 active:scale-95 transition-all"
+            onClick={handleAcknowledge} 
+            className={`flex-1 py-3 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all ${
+              activeToast.priority === 'High' ? 'bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' :
+              activeToast.priority === 'Medium' ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.3)]' :
+              'bg-primary shadow-[0_0_20px_rgba(99,102,241,0.3)]'
+            }`}
           >
             Acknowledge
           </button>

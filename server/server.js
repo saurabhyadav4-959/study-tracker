@@ -37,4 +37,10 @@ app.get('/api/health', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('SERVER_ERROR:', err);
+  res.status(500).json({ message: 'INTERNAL_SERVER_ERROR', error: err.message });
+});
+
 app.listen(PORT, () => console.log(`SYSTEM HUB SERVER INITIALIZED ON PORT ${PORT}`));

@@ -201,4 +201,25 @@ router.post('/state', auth, async (req, res) => {
   }
 });
 
+// Get pending parent alerts for student
+router.get('/alerts/pending', auth, async (req, res) => {
+  try {
+    const alerts = await db.alerts.find({ userId: req.user.id, read: false });
+    res.json(alerts);
+  } catch (err) {
+    res.status(500).json({ message: 'FAILED TO FETCH ALERTS', error: err.message });
+  }
+});
+
+// Mark alert as read
+router.post('/alerts/mark-read', auth, async (req, res) => {
+  try {
+    const { alertId } = req.body;
+    await db.alerts.update(alertId, { read: true });
+    res.json({ message: 'ALERT ACKNOWLEDGED' });
+  } catch (err) {
+    res.status(500).json({ message: 'FAILED TO ACKNOWLEDGE', error: err.message });
+  }
+});
+
 module.exports = router;

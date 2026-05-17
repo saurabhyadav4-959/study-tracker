@@ -8,6 +8,7 @@ const Task = require('./models/Task');
 const ActivityLog = require('./models/ActivityLog');
 const Milestone = require('./models/Milestone');
 const ParentStudentLink = require('./models/ParentStudentLink');
+const Alert = require('./models/Alert');
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -92,6 +93,14 @@ const db = {
       return await newLink.save();
     },
     update: async (id, updates) => await ParentStudentLink.findByIdAndUpdate(id, updates, { new: true })
+  },
+  alerts: {
+    find: async (query = {}) => await Alert.find(query),
+    insert: async (alert) => {
+      const newAlert = new Alert(alert);
+      return await newAlert.save();
+    },
+    update: async (id, updates) => await Alert.findByIdAndUpdate(id, updates, { new: true })
   }
 };
 
