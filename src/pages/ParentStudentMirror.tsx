@@ -114,18 +114,19 @@ const ParentStudentMirror = () => {
   };
 
   useEffect(() => {
-    fetchChildren();
+    fetchChildren(true);
     const interval = setInterval(() => {
-      fetchChildren();
+      fetchChildren(false);
     }, 10000);
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
+    // Only fetch silently on manual selectedId change, since fetchChildren already handles background loads
     if (selectedId) performDeepScan(selectedId, true);
   }, [selectedId]);
 
-  const fetchChildren = async () => {
+  const fetchChildren = async (isInitial = false) => {
     const user = JSON.parse(localStorage.getItem('systemhub_active_user') || '{}');
     try {
       const res = await fetch(`${API_BASE_URL}/api/parent/children`, {
@@ -135,8 +136,12 @@ const ParentStudentMirror = () => {
       if (Array.isArray(childrenData)) {
         setChildren(childrenData);
         if (childrenData.length > 0) {
-          setSelectedId(childrenData[0].id);
-          performDeepScan(childrenData[0].id);
+          setSelectedId(prevId => {
+            const activeId = prevId || childrenData[0].id;
+            // Silent updates for background polling, show loader for initial load
+            performDeepScan(activeId, !isInitial);
+            return activeId;
+          });
         }
       } else {
         setChildren([]);
@@ -144,7 +149,7 @@ const ParentStudentMirror = () => {
     } catch (err) {
       console.error('Failed to fetch children', err);
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   };
 
