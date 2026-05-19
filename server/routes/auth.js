@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../db_adapter');
 const auth = require('../middleware/auth');
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Register
 // Register
@@ -112,6 +114,62 @@ router.post('/login', async (req, res) => {
       message: 'AUTHORIZATION ERROR', 
       error: err.message 
     });
+  }
+});
+
+// Google Login / Register
+router.post('/google', async (req, res) => {
+  const { credential } = req.body;
+  
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name } = payload;
+    
+    console.log(`[AUTH] Google auth attempt: ${email}`);
+
+    // Check if user exists
+    let user = await db.users.findOne({ email });
+
+    if (user) {
+      // User exists, update googleId if not present
+      if (!user.googleId) {
+        await db.users.update(user._id, { googleId });
+        console.log(`[AUTH] Linked Google ID for existing user: ${email}`);
+      }
+    } else {
+      // New user, register automatically
+      console.log(`[AUTH] Synthesizing new node via Google: ${email}`);
+      user = await db.users.insert({
+        name: name,
+        email: email,
+        googleId: googleId,
+        role: 'pending',
+        linkedChildren: []
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role }, 
+      process.env.JWT_SECRET || 'neural_secret_key'
+    );
+
+    res.json({ 
+      token, 
+      user: { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        role: user.role,
+        studentCode: user.studentCode || ''
+      } 
+    });
+  } catch (err) {
+    console.error(`[AUTH FATAL] Google Auth Error: ${err.message}`);
+    res.status(500).json({ message: 'GOOGLE AUTHORIZATION FAILED', error: err.message });
   }
 });
 

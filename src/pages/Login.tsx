@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Zap, Mail, Lock, AlertCircle, Fingerprint } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 import { API_BASE_URL } from '../config';
 
 const Login: React.FC = () => {
@@ -11,6 +12,46 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  const handleGoogleSuccess = async (tokenResponse: any) => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: tokenResponse.credential || tokenResponse.access_token || tokenResponse.id_token }), // useGoogleLogin implicit flow might just give access_token, wait, let's use standard credential flow if possible or fetch userinfo, but our backend expects id_token. Actually we can use useGoogleLogin with flow: 'implicit' which gives access_token, but backend needs idToken.
+      });
+      
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'GOOGLE AUTH FAILED');
+
+      localStorage.setItem('systemhub_active_user', JSON.stringify({
+        id: data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        role: data.user.role,
+        studentCode: data.user.studentCode,
+        token: data.token
+      }));
+
+      const role = data.user.role;
+      if (!role || role === 'pending') {
+        navigate('/onboarding');
+      } else {
+        const targetPath = role === 'parent' ? '#/parent/dashboard' : '#/dashboard';
+        setTimeout(() => {
+          const base = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+          window.location.href = window.location.origin + base + targetPath;
+          window.location.reload();
+        }, 1000);
+      }
+    } catch (err: any) {
+      setError(err.message.toUpperCase());
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,6 +213,25 @@ const Login: React.FC = () => {
                   </>
                 )}
               </button>
+
+              <div className="relative flex items-center py-5">
+                <div className="flex-grow border-t border-white/10"></div>
+                <span className="flex-shrink-0 mx-4 text-white/30 text-xs font-black uppercase tracking-widest">or integrate</span>
+                <div className="flex-grow border-t border-white/10"></div>
+              </div>
+
+              <div className="flex justify-center mt-2 w-full [&>div]:w-full [&>div>div]:!w-full [&>div>div]:!flex [&>div>div]:!justify-center">
+                <GoogleLogin 
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => setError('GOOGLE AUTHENTICATION FAILED')}
+                  theme="filled_black"
+                  shape="pill"
+                  size="large"
+                  text={mode === 'login' ? 'signin_with' : 'signup_with'}
+                  width="100%"
+                />
+              </div>
+
             </form>
           </div>
         </div>

@@ -12,6 +12,7 @@
     "start": "cd server && node server.js"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.13.5",
     "chart.js": "^4.4.2",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",

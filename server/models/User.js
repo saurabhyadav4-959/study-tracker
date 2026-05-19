@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'INVALID EMAIL FORMAT']
   },
-  password: { type: String, required: true },
+  password: { type: String },
+  googleId: { type: String, unique: true, sparse: true },
   role: { type: String, enum: ['student', 'parent', 'pending'], default: 'pending' },
   studentCode: { type: String, unique: true, sparse: true },
   linkedChildren: [{ type: String }],
