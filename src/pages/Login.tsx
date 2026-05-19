@@ -214,22 +214,25 @@ const Login: React.FC = () => {
                 )}
               </button>
 
-              <div className="relative flex items-center py-5">
-                <div className="flex-grow border-t border-white/10"></div>
-                <span className="flex-shrink-0 mx-4 text-white/30 text-xs font-black uppercase tracking-widest">or integrate</span>
-                <div className="flex-grow border-t border-white/10"></div>
+              <div className="relative flex items-center py-6">
+                <div className="flex-grow border-t border-white/5"></div>
+                <span className="flex-shrink-0 mx-6 text-white/20 text-[9px] font-black uppercase tracking-[0.4em]">secure quantum link</span>
+                <div className="flex-grow border-t border-white/5"></div>
               </div>
 
-              <div className="flex justify-center mt-2 w-full [&>div]:w-full [&>div>div]:!w-full [&>div>div]:!flex [&>div>div]:!justify-center">
-                <GoogleLogin 
-                  onSuccess={handleGoogleSuccess}
-                  onError={() => setError('GOOGLE AUTHENTICATION FAILED')}
-                  theme="filled_black"
-                  shape="pill"
-                  size="large"
-                  text={mode === 'login' ? 'signin_with' : 'signup_with'}
-                  width="100%"
-                />
+              <div className="relative group/google w-full p-[2px] rounded-[2rem] bg-gradient-to-r from-primary/30 via-secondary/30 to-primary/30 hover:from-primary hover:via-secondary hover:to-primary transition-all duration-700 shadow-[0_0_25px_rgba(99,102,241,0.1)] hover:shadow-[0_0_35px_rgba(99,102,241,0.35)] overflow-hidden">
+                <div className="absolute inset-0 bg-[#0a0a0c] rounded-[2rem] margin-[1px] -z-10" />
+                <div className="flex justify-center w-full bg-black/40 backdrop-blur-md rounded-[2rem] py-3 px-4 [&>div]:w-full [&>div>div]:!w-full [&>div>div]:!flex [&>div>div]:!justify-center [&>div>div]:!bg-transparent [&>div>div>iframe]:!rounded-[1.8rem]">
+                  <GoogleLogin 
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => setError('GOOGLE AUTHENTICATION FAILED')}
+                    theme="filled_black"
+                    shape="pill"
+                    size="large"
+                    text={mode === 'login' ? 'signin_with' : 'signup_with'}
+                    width="100%"
+                  />
+                </div>
               </div>
 
             </form>
